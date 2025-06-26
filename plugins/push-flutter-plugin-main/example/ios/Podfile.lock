@@ -1,0 +1,29 @@
+PODS:
+  - Flutter (1.0.0)
+  - flutter_plugin_engagelab (0.0.3):
+    - Flutter
+    - MTPush (= 5.0.0)
+  - MTPush (5.0.0)
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - flutter_plugin_engagelab (from `.symlinks/plugins/flutter_plugin_engagelab/ios`)
+
+SPEC REPOS:
+  trunk:
+    - MTPush
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  flutter_plugin_engagelab:
+    :path: ".symlinks/plugins/flutter_plugin_engagelab/ios"
+
+SPEC CHECKSUMS:
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  flutter_plugin_engagelab: a624a908faff370efd2b566574fcd40809e5640a
+  MTPush: 0b3853e93099c87ea11601424a353ed86e7406c1
+
+PODFILE CHECKSUM: 663715e941f9adb426e33bf9376914006f9ea95b
+
+COCOAPODS: 1.16.2

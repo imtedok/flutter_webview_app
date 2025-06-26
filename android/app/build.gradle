@@ -1,0 +1,121 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+
+def keystoreProperties = new Properties()
+
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+android {
+    namespace "com.kkgametop.game"
+    compileSdkVersion flutter.compileSdkVersion
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        applicationId "com.kkgametop.game"
+        // You can update the following values to match your application needs.
+        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
+        minSdkVersion flutter.minSdkVersion
+        targetSdkVersion flutter.targetSdkVersion
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+
+        // 配置支持的 ARM 架构
+        /*ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
+        }*/
+
+        // 极光推送国际版 各推送渠道配置
+        manifestPlaceholders = [
+                // 测试：f2ce36eb5892b8c954a301e7  线上：e7cfd2e5a3b0126703c7f1ae
+                ENGAGELAB_PRIVATES_APPKEY : "e7cfd2e5a3b0126703c7f1ae",
+                ENGAGELAB_PRIVATES_CHANNEL: "developer",
+                ENGAGELAB_PRIVATES_PROCESS: ":remote",
+                XIAOMI_APPID            : "",//Xiaomi manufacturer, fill in the MI-appid if it exists. If not, don’t fill it in. Leave it as ""
+                XIAOMI_APPKEY           : "",//Xiaomi manufacturer, if available, fill in MI-appkey, if not, don’t fill it in, leave it as ""
+                MEIZU_APPID            : "",//Meizu manufacturer, if available, fill in MZ-appid, if not, do not fill in, leave it as ""
+                MEIZU_APPKEY           : "",//Meizu manufacturer, if available, fill in MZ-appkey, if not, do not fill in, leave it as ""
+                OPPO_APPID             : "",//OOPPO manufacturer, if yes, fill in OP-appid, if not, no need to fill in, leave it as ""
+                OPPO_APPKEY            : "",//OPPO manufacturer, if yes, fill in OP-appkey, if not, no need to fill in, leave it as ""
+                OPPO_APPSECRET         : "",//OPPO manufacturer, if yes, fill in OP-appsecret, if not, no need to fill in, leave it as ""
+                VIVO_APPID             : "",//VIVO manufacturer, if available, fill in vivo appid, if not, don’t fill in, leave it as ""
+                VIVO_APPKEY            : "",//VIVO manufacturer, if available, fill in vivo appkey, if not, don’t fill in, leave it as ""
+                HONOR_APPID            : "",//Honor manufacturer, if you have it, fill in honnor appid, if not, don’t fill it in, leave it as ""
+                APP_TCP_SSL            : "",//android - Whether the tcp connection is encrypted, fill in true to indicate encryption, otherwise it means not encrypted, and can be left as "". For this data to take effect, you need to add android:name="com.engagelab.privates.flutter_plugin_engagelab.MTApplication" to the application in AndroidManifest.xml. Or let your MainApplication inherit MTApplication.
+                APP_DEBUG            : "",//android - Fill in true to indicate debug mode, others indicate non-debug mode, and can be left as "". For this data to take effect, you need to add android:name="com.engagelab.privates.flutter_plugin_engagelab.MTApplication" to the application in AndroidManifest.xml, or inherit this object.
+                COUNTRY_CODE            : "",//For testing, can be left as "".For this data to take effect, you need to add android:name="com.engagelab.privates.flutter_plugin_engagelab.MTApplication" to the application in AndroidManifest.xml, or inherit this object.
+        ]
+    }
+
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+        debug {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+
+    buildTypes {
+        release {
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {}

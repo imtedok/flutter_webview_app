@@ -1,0 +1,21 @@
+flutter_native_splash:
+#  color: "#ffffff"
+  background_image: assets/loadingPage2.jpg
+#  image: assets/loadingPage2.jpg
+#  branding: assets/branding-acceptance.png
+#  branding_bottom_padding: 24
+#  color_dark: "#121212"
+  background_image_dark: assets/loadingPage2.jpg
+#  image_dark: assets/loadingPage2.jpg
+#  branding_dark: assets/branding-acceptance.png
+
+  android_12:
+    color: "#331D63"
+    image: assets/appLogo.png
+    icon_background_color: "#331D63"
+    color_dark: "#331D63"
+    image_dark: assets/appLogo.png
+    icon_background_color_dark: "#331D63"
+
+  web: false
+  fullscreen: true
