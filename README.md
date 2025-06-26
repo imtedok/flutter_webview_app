@@ -1,6 +1,6 @@
 # game_shell_engine
 
-kk game 网页项目的 flutter 壳工程，内部使用webview加载
+用于kk game 网页项目构建移动端apk/ipa的 flutter 壳工程，内部使用webview加载
 
 ## Getting Started
 
