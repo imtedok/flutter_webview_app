@@ -109,6 +109,8 @@ class _HomePageState extends State<HomePage> {
                           supportMultipleWindows: true,
                           mediaPlaybackRequiresUserGesture: false,
                           allowsInlineMediaPlayback: true,
+                          // 允许混合内容 (HTTP/HTTPS)，解决在android手机上网址访问（http跳转链接、http图片链接等）不了的问题
+                          mixedContentMode: MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
                         ),
                         pullToRefreshController: pullToRefreshController,
                         onWebViewCreated: (controller) async {
