@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -19,9 +20,26 @@ class JPushUtil {
   static const JPUSH_APP_KEY = 'e7cfd2e5a3b0126703c7f1ae';
 
   late String registrationID;
-
+  Timer? timer; // 使用可空的 Timer，方便取消
+  void initTimer() {
+    timer?.cancel();
+    timer = null;
+  }
   Future<String> _getRegistrationID() async {
     registrationID = await FlutterPluginEngagelab.getRegistrationId();
+    if (registrationID.isEmpty) {
+      initTimer();
+      timer = Timer.periodic(Duration(seconds: 2), (Timer t) {
+        if (kDebugMode) {
+          print('轮询执行: ${DateTime.now()}');
+        }
+        // 再次获取rgid
+        _getRegistrationID();
+      });
+      return '';
+    } else {
+      initTimer();
+    }
     initBadgeCount(null);
     FlutterPluginEngagelab.printMy(
         "flutter get registration id : $registrationID");
@@ -36,6 +54,8 @@ class JPushUtil {
         alignment: Alignment.center,
         child: Text('推送id: $registrationID', style: TextStyle(color: Colors.white)),
       );
+    }, onDismiss: () {
+      sendLocalMessage();
     });
     return registrationID;
   }
