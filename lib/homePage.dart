@@ -215,6 +215,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     DraggableFloatWidget(
+                      width: 48,
+                      height: 48,
                       // eventStreamController: eventStreamController,
                       config: DraggableFloatWidgetBaseConfig(
                         isFullScreen: false,
@@ -233,7 +235,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         alignment: Alignment.center,
                         padding: EdgeInsets.all(5),
-                        child: Icon(Icons.refresh_rounded, color: Colors.white, size: 46),
+                        child: Icon(Icons.refresh_rounded, color: Colors.white, size: 32),
                       ),
                     )
                   ],
