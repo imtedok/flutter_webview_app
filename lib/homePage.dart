@@ -97,9 +97,10 @@ class _HomePageState extends State<HomePage> {
                     child: InAppWebView(
                       key: webViewKey,
                       initialUrlRequest: URLRequest(
+                        /// WebUri('https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev/')
                         /// WebUri('http://192.168.18.182')
                         /// WebUri('https://www.kkgametop.xyz')
-                        url: WebUri('https://www.kkgametop.xyz'),
+                        url: WebUri('https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev'),
                       ),
                       initialSettings: InAppWebViewSettings(
                         javaScriptEnabled: true,
@@ -108,6 +109,8 @@ class _HomePageState extends State<HomePage> {
                         supportMultipleWindows: true,
                         mediaPlaybackRequiresUserGesture: false,
                         allowsInlineMediaPlayback: true,
+                        // 允许不安全请求（如http）
+                        allowUniversalAccessFromFileURLs: true,
                         // 允许混合内容 (HTTP/HTTPS)，解决在android手机上网址访问（http跳转链接、http图片链接等）不了的问题
                         mixedContentMode: MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
                       ),
@@ -122,7 +125,22 @@ class _HomePageState extends State<HomePage> {
                             if (kDebugMode) {
                               print("JS called Flutter: $arguments");
                             }
-                            return {"status": "ok", "received": arguments};
+                            if (arguments.isNotEmpty) {
+                              if (kDebugMode) {
+                                print("JS called Flutter: ${arguments[0]['type']}");
+                              }
+                              if (arguments[0]['type'] == 'NativeInfo') {
+                                return {
+                                  "status": "000000",
+                                  "received": {
+                                    'regId': JPushUtil().registrationID,
+                                    'platform': Platform.operatingSystem
+                                  }
+                                };
+                              }
+                            }
+
+                            return {"status": "000000", "received": null};
                           },
                         );
                       },
@@ -167,13 +185,9 @@ class _HomePageState extends State<HomePage> {
                               'navigationAction = ${navigationAction.toString()}');
                         }
                         final uri = navigationAction.request.url;
-                        if ((uri?.toString().startsWith(
-                            'https://www.kkgametop.xyz') ??
-                            false) ||
-                            (uri
-                                ?.toString()
-                                .startsWith('http://192.168.18.182') ??
-                                false)) {
+                        if ((uri?.toString().startsWith('https://www.kkgametop.xyz') ??false)
+                          || (uri?.toString().startsWith('http://192.168.18.182') ??false)
+                          || (uri?.toString().startsWith('https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev') ??false)) {
                           /// 放行
                           return Future(
                                 () => NavigationActionPolicy.ALLOW,

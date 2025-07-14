@@ -29,7 +29,7 @@ class JPushUtil {
     registrationID = await FlutterPluginEngagelab.getRegistrationId();
     if (registrationID.isEmpty) {
       initTimer();
-      timer = Timer.periodic(Duration(seconds: 2), (Timer t) {
+      timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
         if (kDebugMode) {
           print('轮询执行: ${DateTime.now()}');
         }
@@ -141,7 +141,7 @@ class JPushUtil {
       FlutterPluginEngagelab.initAndroid();
     }
 
-    _getRegistrationID();
+    await _getRegistrationID();
   }
 
   void _doNext(Map<String, dynamic> data) {
