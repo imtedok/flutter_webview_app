@@ -100,7 +100,7 @@ class _HomePageState extends State<HomePage> {
                         /// WebUri('https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev/')
                         /// WebUri('http://192.168.18.182')
                         /// WebUri('https://www.kkgametop.xyz')
-                        url: WebUri('https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev'),
+                        url: WebUri('https://www.kkgametop.xyz'),
                       ),
                       initialSettings: InAppWebViewSettings(
                         javaScriptEnabled: true,
