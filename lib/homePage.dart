@@ -32,22 +32,62 @@ class _HomePageState extends State<HomePage> {
   );
   bool pullToRefreshEnabled = true;
 
+  OverlayEntry? _overlayEntry;
+  void _removePreviousOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+  void _showOverlay() {
+    // 1. remove previous overlay
+    _removePreviousOverlay();
+    // 2. show new overlay
+    _overlayEntry = OverlayEntry(builder: (context) {
+      return DraggableFloatWidget(
+        width: 48,
+        height: 48,
+        config: DraggableFloatWidgetBaseConfig(
+          initPositionYInTop: false,
+          initPositionYMarginBorder: 50,
+          borderTopContainTopBar: true,
+          borderBottom: 50 + defaultBorderWidth,
+        ),
+        onTap: () async {
+          await _controler.reload();
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.black54,
+            borderRadius: BorderRadius.circular(360),
+          ),
+          alignment: Alignment.center,
+          padding: EdgeInsets.all(5),
+          child: Icon(Icons.refresh_rounded, color: Colors.white, size: 32),
+        ),
+      );
+    });
+
+    /// Warning: context cannot be the context of MaterialApp
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
   @override
   void initState() {
     super.initState();
     // 在页面构建完成后执行
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // 加载悬浮刷新按钮
+      _showOverlay();
       /// 初始化极光推送国际版
       JPushUtil().initJPush();
     });
     pullToRefreshController = kIsWeb
         ? null
         : PullToRefreshController(
-            settings: pullToRefreshSettings,
-            onRefresh: () async {
-              await _controler.reload();
-            },
-          );
+      settings: pullToRefreshSettings,
+      onRefresh: () async {
+        await _controler.reload();
+      },
+    );
   }
 
   @override
@@ -112,7 +152,8 @@ class _HomePageState extends State<HomePage> {
                         // 允许不安全请求（如http）
                         allowUniversalAccessFromFileURLs: true,
                         // 允许混合内容 (HTTP/HTTPS)，解决在android手机上网址访问（http跳转链接、http图片链接等）不了的问题
-                        mixedContentMode: MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
+                        mixedContentMode:
+                            MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
                       ),
                       pullToRefreshController: pullToRefreshController,
                       onWebViewCreated: (controller) async {
@@ -127,7 +168,8 @@ class _HomePageState extends State<HomePage> {
                             }
                             if (arguments.isNotEmpty) {
                               if (kDebugMode) {
-                                print("JS called Flutter: ${arguments[0]['type']}");
+                                print(
+                                    "JS called Flutter: ${arguments[0]['type']}");
                               }
                               if (arguments[0]['type'] == 'NativeInfo') {
                                 return {
@@ -170,7 +212,8 @@ class _HomePageState extends State<HomePage> {
                         }
 
                         setState(() {
-                          currentProgress = double.parse(NumberFormat("#.##").format(progress / 100));
+                          currentProgress = double.parse(
+                              NumberFormat("#.##").format(progress / 100));
                           _isVisibleProgress = progress < 100;
                         });
 
@@ -178,25 +221,32 @@ class _HomePageState extends State<HomePage> {
                           pullToRefreshController?.endRefreshing();
                         }
                       },
-                      shouldOverrideUrlLoading:
-                          (controller, navigationAction) {
+                      shouldOverrideUrlLoading: (controller, navigationAction) {
                         if (kDebugMode) {
                           print(
                               'navigationAction = ${navigationAction.toString()}');
                         }
                         final uri = navigationAction.request.url;
-                        if ((uri?.toString().startsWith('https://www.kkgametop.xyz') ??false)
-                          || (uri?.toString().startsWith('http://192.168.18.182') ??false)
-                          || (uri?.toString().startsWith('https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev') ??false)) {
+                        if ((uri
+                                    ?.toString()
+                                    .startsWith('https://www.kkgametop.xyz') ??
+                                false) ||
+                            (uri
+                                    ?.toString()
+                                    .startsWith('http://192.168.18.182') ??
+                                false) ||
+                            (uri?.toString().startsWith(
+                                    'https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev') ??
+                                false)) {
                           /// 放行
                           return Future(
-                                () => NavigationActionPolicy.ALLOW,
+                            () => NavigationActionPolicy.ALLOW,
                           );
                         }
 
                         /// 禁止网址打开
                         return Future(
-                              () => NavigationActionPolicy.CANCEL,
+                          () => NavigationActionPolicy.CANCEL,
                         );
                       },
                       onCreateWindow: (controller, createWindowAction) async {
@@ -227,29 +277,29 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  DraggableFloatWidget(
-                    width: 48,
-                    height: 48,
-                    // eventStreamController: eventStreamController,
-                    config: DraggableFloatWidgetBaseConfig(
-                      isFullScreen: false,
-                      initPositionYInTop: false,
-                      initPositionYMarginBorder: 50,
-                      borderBottom: 50 + defaultBorderWidth,
-                    ),
-                    onTap: () async {
-                      await _controler.reload();
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black54,
-                        borderRadius: BorderRadius.circular(360),
-                      ),
-                      alignment: Alignment.center,
-                      padding: EdgeInsets.all(5),
-                      child: Icon(Icons.refresh_rounded, color: Colors.white, size: 32),
-                    ),
-                  )
+                  // DraggableFloatWidget(
+                  //   width: 48,
+                  //   height: 48,
+                  //   // eventStreamController: eventStreamController,
+                  //   config: DraggableFloatWidgetBaseConfig(
+                  //     isFullScreen: false,
+                  //     initPositionYInTop: false,
+                  //     initPositionYMarginBorder: 50,
+                  //     borderBottom: 50 + defaultBorderWidth,
+                  //   ),
+                  //   onTap: () async {
+                  //     await _controler.reload();
+                  //   },
+                  //   child: Container(
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.black54,
+                  //       borderRadius: BorderRadius.circular(360),
+                  //     ),
+                  //     alignment: Alignment.center,
+                  //     padding: EdgeInsets.all(5),
+                  //     child: Icon(Icons.refresh_rounded, color: Colors.white, size: 32),
+                  //   ),
+                  // )
                 ],
               ),
             ),
@@ -257,5 +307,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _removePreviousOverlay();
+    super.dispose();
   }
 }
