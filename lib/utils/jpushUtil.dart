@@ -18,7 +18,7 @@ class JPushUtil {
   /// 测试
   // static const JPUSH_APP_KEY = 'f2ce36eb5892b8c954a301e7';
   /// 线上
-  static const JPUSH_APP_KEY = 'e7cfd2e5a3b0126703c7f1ae';
+  static const JPUSH_APP_KEY = '8e5b3c48b18a04f955e90c3c';
 
   late String registrationID;
   Timer? timer; // 使用可空的 Timer，方便取消
