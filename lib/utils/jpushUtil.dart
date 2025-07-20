@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_plugin_engagelab/flutter_plugin_engagelab.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
+import 'WebControllerUtil.dart';
+
 class JPushUtil {
   static JPushUtil? _singleton;
 
@@ -18,7 +20,9 @@ class JPushUtil {
   /// 测试
   // static const JPUSH_APP_KEY = 'f2ce36eb5892b8c954a301e7';
   /// 线上
-  static const JPUSH_APP_KEY = '8e5b3c48b18a04f955e90c3c';
+  static const JPUSH_APP_KEY = '8b68b9303424eadca9e99ae9';
+
+  Map<String, dynamic>? needPushMsg;
 
   late String registrationID;
   Timer? timer; // 使用可空的 Timer，方便取消
@@ -45,7 +49,7 @@ class JPushUtil {
     initBadgeCount(null);
     FlutterPluginEngagelab.printMy(
         "flutter get registration id : $registrationID");
-    SmartDialog.show(builder: (context) {
+    /*SmartDialog.show(builder: (context) {
       return Container(
         height: 80,
         width: 220,
@@ -67,7 +71,7 @@ class JPushUtil {
         "extras": {"foodName": "肯德基大盘鸡", "price": "100"}
       };
       JPushUtil().sendLocalMessage(msg);
-    });
+    });*/
     return registrationID;
   }
 
@@ -127,16 +131,20 @@ class JPushUtil {
         // todo 推送通知栏新消息，tips：当通知栏被关闭时手机状态栏不会出现通知消息，只有app运行位于前台时会触发此回调
         // 安卓收到的消息数据：{event_name: onNotificationArrived, event_data: {"badge":1,"bigPicture":"","bigText":"","builderId":0,"category":"","channelId":"","content":"恭喜您中奖了","defaults":0,"extras":{"name":"tox"},"inbox":[],"intentSsl":"","intentUri":"","largeIcon":"","messageId":"558497131","notificationId":558497131,"overrideMessageId":"","platform":0,"platformMessageId":"","priority":0,"smallIcon":"","sound":"","style":0,"title":"通知"}}
         // 苹果收到的消息数据：{event_name: willPresentNotification, event_data: {"_j_msgid":561712896,"_j_business":1,"_j_engagel_cloud":1,"_j_uid":40011962683,"aps":{"mutable-content":1,"alert":{"title":"重要通知","body":"您有一份大餐即将送达，请注意查收！！！"},"badge":2,"sound":"default"},"foodName":"大盘鸡","inapp":{"inapp_end_time":1750485066112},"price":"200","extras":{"inapp":{"inapp_end_time":1750485066112},"_j_engagel_cloud":1,"price":"200","foodName":"大盘鸡"}}}
-        _doNext(eventData);
+        // _doNext(eventData);
         // JPushUtil().sendLocalMessage(eventData);
+        needPushMsg = eventData;
+        WebControllerUtil().evaluateJavascript();
       } else if (eventName == "onNotificationClicked" ||
           eventName == "didReceiveNotificationResponse") {
         // todo 点击通知栏消息，在此时通常可以做一些页面跳转等
-        _doNext(eventData);
+        // _doNext(eventData);
+        needPushMsg = eventData;
+        WebControllerUtil().evaluateJavascript();
       } else if (eventName == "onCustomMessage" ||
           eventName == "networkDidReceiveMessage") {
         // todo 自定义消息回调，在此时通常可以做一些页面跳转等
-        _doNext(eventData);
+        // _doNext(eventData);
         // JPushUtil().sendLocalMessage(eventData);
       } else {}
     });

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:game_shell_engine/utils/WebControllerUtil.dart';
 import 'package:game_shell_engine/utils/jpushUtil.dart';
 import 'package:game_shell_engine/windowPopup.dart';
 import 'package:intl/intl.dart';
@@ -21,7 +22,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final GlobalKey webViewKey = GlobalKey();
-  late InAppWebViewController _controler;
   bool _isVisibleProgress = true;
   double currentProgress = 0.0;
 
@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
           borderBottom: 50 + defaultBorderWidth,
         ),
         onTap: () async {
-          await _controler.reload();
+          await WebControllerUtil().controller?.reload();
         },
         child: Container(
           decoration: BoxDecoration(
@@ -85,7 +85,7 @@ class _HomePageState extends State<HomePage> {
         : PullToRefreshController(
       settings: pullToRefreshSettings,
       onRefresh: () async {
-        await _controler.reload();
+        await WebControllerUtil().controller?.reload();
       },
     );
   }
@@ -98,8 +98,9 @@ class _HomePageState extends State<HomePage> {
         /// 已处理弹出则直接返回
         if (didPop) return;
 
-        if (await _controler.canGoBack()) {
-          _controler.goBack();
+        final canGoBack = await WebControllerUtil().controller?.canGoBack() ?? false;
+        if (canGoBack) {
+          WebControllerUtil().controller?.goBack();
         } else {
           if (mounted) {
             /// 手动触发返回
@@ -137,10 +138,11 @@ class _HomePageState extends State<HomePage> {
                     child: InAppWebView(
                       key: webViewKey,
                       initialUrlRequest: URLRequest(
-                        /// WebUri('https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev/')
+                        /// WebUri('https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev')
                         /// WebUri('http://192.168.18.182')
                         /// WebUri('https://www.kkgametop.xyz')
-                        url: WebUri('https://www.kkgametop.xyz'),
+                        /// WebUri('https://www.ccgametest.live')
+                        url: WebUri('https://www.ccgametest.live'),
                       ),
                       initialSettings: InAppWebViewSettings(
                         javaScriptEnabled: true,
@@ -157,34 +159,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                       pullToRefreshController: pullToRefreshController,
                       onWebViewCreated: (controller) async {
-                        _controler = controller;
-
-                        /// 网页 JS 调用 flutter 方法，主动发送数据给 flutter，同时 flutter 处理数据后可以再发送响应数据给 JS
-                        controller.addJavaScriptHandler(
-                          handlerName: 'sendMessageToNative',
-                          callback: (arguments) {
-                            if (kDebugMode) {
-                              print("JS called Flutter: $arguments");
-                            }
-                            if (arguments.isNotEmpty) {
-                              if (kDebugMode) {
-                                print(
-                                    "JS called Flutter: ${arguments[0]['type']}");
-                              }
-                              if (arguments[0]['type'] == 'NativeInfo') {
-                                return {
-                                  "status": "000000",
-                                  "received": {
-                                    'regId': JPushUtil().registrationID,
-                                    'platform': Platform.operatingSystem
-                                  }
-                                };
-                              }
-                            }
-
-                            return {"status": "000000", "received": null};
-                          },
-                        );
+                        WebControllerUtil().initWebFields(controller, true);
+                        WebControllerUtil().addJavaScriptHandler();
                       },
                       onLoadStop: (controller, url) async {
                         /// 链接加载完时回调
@@ -192,13 +168,8 @@ class _HomePageState extends State<HomePage> {
                         FlutterNativeSplash.remove();
                         pullToRefreshController?.endRefreshing();
 
-                        /// flutter 主动调用 JS 中定义的全局方法
-                        /*await controller.evaluateJavascript(
-                            source: '''
-                            if (window.nativeCallJs) {
-                              window.nativeCallJs("Hello from Flutter");
-                            }
-                        ''');*/
+                        WebControllerUtil().isUrlLoadStop = true;
+                        WebControllerUtil().evaluateJavascript();
                       },
                       onReceivedError: (controller, request, error) {
                         /// 链接加载出错时回调
@@ -277,29 +248,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  // DraggableFloatWidget(
-                  //   width: 48,
-                  //   height: 48,
-                  //   // eventStreamController: eventStreamController,
-                  //   config: DraggableFloatWidgetBaseConfig(
-                  //     isFullScreen: false,
-                  //     initPositionYInTop: false,
-                  //     initPositionYMarginBorder: 50,
-                  //     borderBottom: 50 + defaultBorderWidth,
-                  //   ),
-                  //   onTap: () async {
-                  //     await _controler.reload();
-                  //   },
-                  //   child: Container(
-                  //     decoration: BoxDecoration(
-                  //       color: Colors.black54,
-                  //       borderRadius: BorderRadius.circular(360),
-                  //     ),
-                  //     alignment: Alignment.center,
-                  //     padding: EdgeInsets.all(5),
-                  //     child: Icon(Icons.refresh_rounded, color: Colors.white, size: 32),
-                  //   ),
-                  // )
                 ],
               ),
             ),

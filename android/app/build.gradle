@@ -29,7 +29,7 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
-    namespace "com.kkgametop.game"
+    namespace "com.ccgametest.live"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -47,7 +47,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.kkgametop.game"
+        applicationId "com.ccgametest.live"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion flutter.minSdkVersion
@@ -62,8 +62,8 @@ android {
 
         // 极光推送国际版 各推送渠道配置
         manifestPlaceholders = [
-                // 测试：f2ce36eb5892b8c954a301e7  线上：8e5b3c48b18a04f955e90c3c
-                ENGAGELAB_PRIVATES_APPKEY : "8e5b3c48b18a04f955e90c3c",
+                // 测试：f2ce36eb5892b8c954a301e7  线上：8b68b9303424eadca9e99ae9
+                ENGAGELAB_PRIVATES_APPKEY : "8b68b9303424eadca9e99ae9",
                 ENGAGELAB_PRIVATES_CHANNEL: "developer",
                 ENGAGELAB_PRIVATES_PROCESS: ":remote",
                 XIAOMI_APPID            : "",//Xiaomi manufacturer, fill in the MI-appid if it exists. If not, don’t fill it in. Leave it as ""

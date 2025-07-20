@@ -12,7 +12,7 @@
 
     <!--        android:name="${applicationName}"-->
     <application
-        android:label="KK Game"
+        android:label="CC Game"
         android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="true">
         <activity

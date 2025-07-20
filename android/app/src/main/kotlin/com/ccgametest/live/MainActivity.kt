@@ -1,4 +1,4 @@
-package com.kkgametop.game
+package com.ccgametest.live
 
 import io.flutter.embedding.android.FlutterActivity
 
