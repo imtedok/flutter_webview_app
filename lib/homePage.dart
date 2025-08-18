@@ -142,7 +142,7 @@ class _HomePageState extends State<HomePage> {
                         /// WebUri('http://192.168.18.182')
                         /// WebUri('https://www.kkgametop.xyz')
                         /// WebUri('https://www.ccgametest.live')
-                        url: WebUri('https://www.ccgametest.live'),
+                        url: WebUri('https://new.ccgametest.live'),
                       ),
                       initialSettings: InAppWebViewSettings(
                         javaScriptEnabled: true,

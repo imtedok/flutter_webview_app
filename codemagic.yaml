@@ -1,0 +1,42 @@
+workflows:
+  flutter_webview_app:
+    name: Flutter WebView App
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      xcode: latest
+      android: latest
+    cache:
+      cache_paths:
+        - $HOME/.pub-cache
+        - $HOME/.gradle/caches
+
+    scripts:
+      - name: Install dependencies
+        script: flutter pub get
+
+      - name: Build Android APK
+        script: |
+          flutter build apk --no-tree-shake-icons --split-per-abi
+
+      - name: Build iOS IPA (unsigned)
+        script: |
+          flutter build ios --release --no-tree-shake-icons --no-codesign
+
+    artifacts:
+      - build/app/outputs/flutter-apk/app-release.apk
+      - build/ios/iphoneos/*.app
+      - build/ios/ipa/*.ipa
+
+    publishing:
+      email:
+        recipients:
+          - xs121913958@163.com
+      # 你可以直接上传到三方超级签平台 (Pgyer, Fir.im) 的 API，这里给示例
+      scripts:
+        - name: Upload to Pgyer (可选)
+          script: |
+            curl -F "file=@build/app/outputs/flutter-apk/app-release.apk" \
+                 -F "uKey=$PGYER_UKEY" \
+                 -F "_api_key=$PGYER_API_KEY" \
+                 https://www.pgyer.com/apiv2/app/upload
