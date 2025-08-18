@@ -15,11 +15,17 @@ workflows:
       - name: Install dependencies
         script: flutter pub get
 
+      # 生成 keystore 文件
+      - name: Prepare Keystore
+        script: |
+          mkdir -p android
+          echo $KEYSTORE_BASE64 | base64 --decode > android/keystore.jks
+
       # Android 构建 - 已签名 APK
       - name: Build Android APK (Signed)
         script: |
-          # 创建 keystore.properties
-          echo "storeFile=$KEYSTORE_FILE" > android/key.properties
+          # 创建 key.properties
+          echo "storeFile=android/keystore.jks" > android/key.properties
           echo "storePassword=$KEYSTORE_PASSWORD" >> android/key.properties
           echo "keyAlias=$KEY_ALIAS" >> android/key.properties
           echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
