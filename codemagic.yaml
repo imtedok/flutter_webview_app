@@ -15,13 +15,26 @@ workflows:
       - name: Install dependencies
         script: flutter pub get
 
-      - name: Build Android APK
+      # Android 构建 - 已签名 APK
+      - name: Build Android APK (Signed)
         script: |
+          # 创建 keystore.properties
+          echo "storeFile=$KEYSTORE_FILE" > android/key.properties
+          echo "storePassword=$KEYSTORE_PASSWORD" >> android/key.properties
+          echo "keyAlias=$KEY_ALIAS" >> android/key.properties
+          echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
+          
+          # 构建已签名 APK
           flutter build apk --no-tree-shake-icons --split-per-abi
 
-      - name: Build iOS IPA (unsigned)
+      # iOS 构建 - 未签名 IPA
+      - name: Build iOS (Unsigned IPA for Super Sign)
         script: |
           flutter build ios --release --no-tree-shake-icons --no-codesign
+          mkdir -p build/ios/ipa
+          xcrun -sdk iphoneos PackageApplication \
+            -v build/ios/iphoneos/Runner.app \
+            -o $(pwd)/build/ios/ipa/Runner-unsigned.ipa
 
     artifacts:
       - build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
@@ -32,11 +45,18 @@ workflows:
       email:
         recipients:
           - xs121913958@163.com
-      # 你可以直接上传到三方超级签平台 (Pgyer, Fir.im) 的 API，这里给示例
+
       scripts:
-        - name: Upload to Pgyer (可选)
+        - name: Upload Android APK to Pgyer
           script: |
-            curl -F "file=@build/app/outputs/flutter-apk/app-release.apk" \
+            curl -F "file=@build/app/outputs/flutter-apk/app-arm64-v8a-release.apk" \
+                 -F "uKey=$PGYER_UKEY" \
+                 -F "_api_key=$PGYER_API_KEY" \
+                 https://www.pgyer.com/apiv2/app/upload
+
+        - name: Upload iOS IPA to Pgyer
+          script: |
+            curl -F "file=@build/ios/ipa/Runner-unsigned.ipa" \
                  -F "uKey=$PGYER_UKEY" \
                  -F "_api_key=$PGYER_API_KEY" \
                  https://www.pgyer.com/apiv2/app/upload
