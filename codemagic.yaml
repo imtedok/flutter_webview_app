@@ -25,7 +25,7 @@ workflows:
       - name: Build Android APK (Signed)
         script: |
           # 创建 keystore.properties
-          echo "storeFile=android/app/release.jks" > android/keystore.properties
+          echo "storeFile=/release.jks" > android/keystore.properties
           echo "storePassword=$KEYSTORE_PASSWORD" >> android/keystore.properties
           echo "keyAlias=$KEY_ALIAS" >> android/keystore.properties
           echo "keyPassword=$KEY_PASSWORD" >> android/keystore.properties
