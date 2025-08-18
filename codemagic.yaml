@@ -19,7 +19,7 @@ workflows:
       - name: Prepare Keystore
         script: |
           mkdir -p android/app
-          echo $KEYSTORE_BASE64 | base64 --decode > release.jks
+          echo $KEYSTORE_BASE64 | base64 --decode > /release.jks
 
       # Android 构建 - 已签名 APK
       - name: Build Android APK (Signed)
