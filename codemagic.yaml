@@ -5,7 +5,7 @@ workflows:
     environment:
       flutter: stable
       xcode: latest
-      android: latest
+      # android: latest
     cache:
       cache_paths:
         - $HOME/.pub-cache
