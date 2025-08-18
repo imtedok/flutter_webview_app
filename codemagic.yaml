@@ -18,14 +18,14 @@ workflows:
       # 生成 keystore 文件
       - name: Prepare Keystore
         script: |
-          mkdir -p android/app
-          echo $KEYSTORE_BASE64 | base64 --decode > /release.jks
+          mkdir -p $CM_BUILD_DIR/android/app
+          echo $KEYSTORE_BASE64 | base64 --decode > $CM_BUILD_DIR/android/app/release.jks
 
       # Android 构建 - 已签名 APK
       - name: Build Android APK (Signed)
         script: |
           # 创建 keystore.properties
-          echo "storeFile=/release.jks" > android/keystore.properties
+          echo "storeFile=$CM_BUILD_DIR/android/app/release.jks" > android/keystore.properties
           echo "storePassword=$KEYSTORE_PASSWORD" >> android/keystore.properties
           echo "keyAlias=$KEY_ALIAS" >> android/keystore.properties
           echo "keyPassword=$KEY_PASSWORD" >> android/keystore.properties
