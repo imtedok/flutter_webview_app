@@ -6,6 +6,11 @@ workflows:
       flutter: stable
       xcode: latest
       # android: latest
+      groups:
+        - app_store_credentials # 添加代码签名组（如果需要iOS签名）
+      vars:
+        BUNDLE_ID: "com.ccgametest.live" # 替换为你的Bundle ID
+        EXPORT_METHOD: "development" # development, ad-hoc, app-store, enterprise
     cache:
       cache_paths:
         - $HOME/.pub-cache
@@ -15,25 +20,88 @@ workflows:
       - name: Install dependencies
         script: flutter pub get
 
+      # 修复 PackageApplication 问题
+      - name: Fix PackageApplication for Xcode 16.4
+        script: |
+          echo "修复 Xcode 16.4 的 PackageApplication 问题..."
+          # 创建必要的目录
+          sudo mkdir -p /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/
+          
+          # 下载 PackageApplication 工具
+          curl -L -o /tmp/PackageApplication https://raw.githubusercontent.com/JackyKing/packageApplication/master/PackageApplication
+          
+          # 设置执行权限
+          chmod +x /tmp/PackageApplication
+          
+          # 复制到 Xcode 目录
+          sudo cp /tmp/PackageApplication /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/PackageApplication
+          
+          # 移除隔离属性
+          sudo xattr -d com.apple.quarantine /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/PackageApplication
+          echo "PackageApplication 修复完成"
+
       # Android 构建 - 已签名 APK
       - name: Build Android APK (Signed)
         script: |
           # 构建已签名 APK
           flutter build apk --no-tree-shake-icons --split-per-abi
 
-      # iOS 构建 - 未签名 IPA
-      - name: Build iOS (Unsigned IPA for Super Sign)
+      # iOS 构建 - 使用现代方法生成 IPA
+      - name: Build iOS IPA (Modern Method)
         script: |
-          flutter build ios --release --no-tree-shake-icons --no-codesign
+          # 清理构建目录
+          flutter clean
+          
+          # 构建 iOS (使用现代方法)
+          flutter build ipa --release --no-tree-shake-icons --export-method $EXPORT_METHOD --no-codesign
+          
+          # 确保 IPA 目录存在
           mkdir -p build/ios/ipa
-          xcrun -sdk iphoneos PackageApplication \
-            -v build/ios/iphoneos/Runner.app \
-            -o $(pwd)/build/ios/ipa/Runner-unsigned.ipa
+          
+          # 复制 IPA 文件到指定目录（如果需要）
+          if [ -f build/ios/ipa/*.ipa ]; then
+            cp build/ios/ipa/*.ipa build/ios/ipa/Runner-unsigned.ipa
+          fi
+          
+          # 备用方案：如果 flutter build ipa 不工作，使用 xcodebuild
+          if [ ! -f build/ios/ipa/*.ipa ]; then
+            echo "使用 xcodebuild 作为备用方案..."
+            xcodebuild -workspace ios/Runner.xcworkspace \
+                      -scheme Runner \
+                      -configuration Release \
+                      -archivePath build/ios/Runner.xcarchive \
+                      archive
+          
+            xcodebuild -exportArchive \
+                      -archivePath build/ios/Runner.xcarchive \
+                      -exportOptionsPlist export_options.plist \
+                      -exportPath build/ios/ipa \
+                      -allowProvisioningUpdates
+          fi
+
+      # 创建 export_options.plist 文件（用于备用方案）
+      - name: Create Export Options Plist
+        script: |
+          cat > export_options.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>$EXPORT_METHOD</string>
+              <key>uploadBitcode</key>
+              <false/>
+              <key>compileBitcode</key>
+              <false/>
+          </dict>
+          </plist>
+          EOF
 
     artifacts:
       - build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
-      - build/ios/iphoneos/*.app
+      - build/ios/iphoneos/Runner.app
       - build/ios/ipa/*.ipa
+      - build/ios/ipa/Runner-unsigned.ipa
 
     publishing:
       email:
@@ -43,14 +111,31 @@ workflows:
       scripts:
         - name: Upload Android APK to Pgyer
           script: |
-            curl -F "file=@build/app/outputs/flutter-apk/app-arm64-v8a-release.apk" \
-                 -F "uKey=$PGYER_UKEY" \
-                 -F "_api_key=$PGYER_API_KEY" \
-                 https://www.pgyer.com/apiv2/app/upload
+            # 检查文件是否存在
+            if [ -f "build/app/outputs/flutter-apk/app-arm64-v8a-release.apk" ]; then
+              curl -F "file=@build/app/outputs/flutter-apk/app-arm64-v8a-release.apk" \
+                   -F "uKey=$PGYER_UKEY" \
+                   -F "_api_key=$PGYER_API_KEY" \
+                   https://www.pgyer.com/apiv2/app/upload
+            else
+              echo "Android APK 文件未找到，跳过上传"
+            fi
 
         - name: Upload iOS IPA to Pgyer
           script: |
-            curl -F "file=@build/ios/ipa/Runner-unsigned.ipa" \
-                 -F "uKey=$PGYER_UKEY" \
-                 -F "_api_key=$PGYER_API_KEY" \
-                 https://www.pgyer.com/apiv2/app/upload
+            # 优先尝试使用现代方法生成的 IPA
+            if [ -f "build/ios/ipa/Runner.ipa" ]; then
+              curl -F "file=@build/ios/ipa/Runner.ipa" \
+                   -F "uKey=$PGYER_UKEY" \
+                   -F "_api_key=$PGYER_API_KEY" \
+                   https://www.pgyer.com/apiv2/app/upload
+            elif [ -f "build/ios/ipa/Runner-unsigned.ipa" ]; then
+              curl -F "file=@build/ios/ipa/Runner-unsigned.ipa" \
+                   -F "uKey=$PGYER_UKEY" \
+                   -F "_api_key=$PGYER_API_KEY" \
+                   https://www.pgyer.com/apiv2/app/upload
+            else
+              echo "iOS IPA 文件未找到，跳过上传"
+              # 列出构建目录内容以便调试
+              ls -la build/ios/ipa/ || true
+            fi
