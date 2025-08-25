@@ -4,15 +4,17 @@ workflows:
     max_build_duration: 60
     environment:
       groups:
-        - base # 确保在此组中设置了 PGYER_UKEY 和 PGYER_API_KEY
+        - base # 包含 PGYER_UKEY 和 PGYER_API_KEY
       flutter: stable
       xcode: latest
       cocoapods: default
 
-      # iOS 代码签名配置
+      # 使用自动代码签名
       ios_signing:
-        distribution_type: ad_hoc
-        bundle_identifier: com.ccgametest.live
+        # 自动代码签名配置
+        automatic: true
+        # 指定分发类型
+        distribution_type: ad_hoc # 可选: ad_hoc, app_store, development, enterprise
 
     cache:
       cache_paths:
@@ -21,31 +23,24 @@ workflows:
 
     scripts:
       - name: Install dependencies
-        script: flutter pub get
+        script: |
+          flutter pub get
 
       - name: Check Flutter environment
-        script: flutter doctor -v
-
-      # 关键修复：确保代码签名设置正确应用
-      - name: Set up code signing
         script: |
-          echo "设置代码签名..."
-          # 确保使用正确的 bundle identifier
-          plutil -replace CFBundleIdentifier -string "com.ccgametest.live" ios/Runner/Info.plist
-          # 显示当前配置，用于调试
-          echo "当前bundle identifier:"
-          plutil -extract CFBundleIdentifier xml1 -o - ios/Runner/Info.plist
-          # 应用代码签名设置
-          xcode-project use-profiles
+          flutter doctor -v
 
       # Android 构建
       - name: Build Android APK
         script: |
           flutter build apk --no-tree-shake-icons --split-per-abi
 
-      # 创建导出选项文件
-      - name: Create export options plist
+      # iOS 构建 - 使用自动代码签名
+      - name: Build iOS IPA
         script: |
+          echo "开始构建 iOS IPA (使用自动代码签名)..."
+          
+          # 创建导出选项文件
           cat > export_options.plist <<EOL
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -64,24 +59,16 @@ workflows:
           </dict>
           </plist>
           EOL
+          
           echo "导出选项文件内容:"
           cat export_options.plist
-
-      # iOS 构建
-      - name: Build iOS IPA
-        script: |
-          echo "开始构建 iOS IPA..."
-          # 检查代码签名设置
-          echo "检查代码签名设置..."
-          xcodebuild -showBuildSettings -workspace ios/Runner.xcworkspace -scheme Runner
           
-          # 构建 IPA
+          # 使用 flutter build ipa 构建
           flutter build ipa --release --no-tree-shake-icons \
             --export-options-plist $CM_BUILD_DIR/export_options.plist
           
-          # 检查输出
           echo "构建完成，检查输出目录:"
-          ls -la $CM_BUILD_DIR/build/ios/ipa/ || echo "IPA目录不存在"
+          ls -la $CM_BUILD_DIR/build/ios/ipa/
 
     artifacts:
       - build/app/outputs/flutter-apk/**/*.apk
