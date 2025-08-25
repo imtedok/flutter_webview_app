@@ -9,13 +9,11 @@ workflows:
       xcode: latest
       cocoapods: default
 
-      # iOS 代码签名配置 - 移除不支持的 automatic: true
-      # 自动代码签名需要在 Codemagic Web 界面中配置
+      # 使用自动代码签名
       ios_signing:
-        # 指定分发类型
-        distribution_type: ad_hoc # 可选: ad_hoc, app_store, development, enterprise
+        distribution_type: ad_hoc
         bundle_identifier: com.ccgametest.live
-        # 确保在 Codemagic Web 界面中配置了自动代码签名
+        # 确保在 Codemagic Web 界面配置了自动代码签名
 
     cache:
       cache_paths:
@@ -30,6 +28,11 @@ workflows:
       - name: Check Flutter environment
         script: |
           flutter doctor -v
+
+      # 先设置代码签名证书
+      - name: Set up code signing
+        script: |
+          keychain initialize
 
       # Android 构建
       - name: Build Android APK
@@ -61,15 +64,9 @@ workflows:
           </plist>
           EOL
           
-          echo "导出选项文件内容:"
-          cat export_options.plist
-          
-          # 使用 flutter build ipa 构建
+          echo "构建 iOS IPA..."
           flutter build ipa --release --no-tree-shake-icons \
-            --export-options-plist $CM_BUILD_DIR/export_options.plist
-          
-          echo "构建完成，检查输出目录:"
-          ls -la $CM_BUILD_DIR/build/ios/ipa/
+            --export-options-plist export_options.plist
 
     artifacts:
       - build/app/outputs/flutter-apk/**/*.apk
