@@ -32,19 +32,6 @@ workflows:
         script: |
           flutter build apk --no-tree-shake-icons --split-per-abi
 
-      # iOS 构建 - 完全重写
-      - name: Build iOS IPA
-        script: |
-          # 关键：使用 'flutter build ipa' 命令而不是 'flutter build ios'
-          # 'flutter build ipa' 会处理整个流程：编译、签名并导出为 .ipa 文件
-          # --export-options-plist 是可选的，但可以用来精确控制导出行为
-          flutter build ipa --release --no-tree-shake-icons \
-            --export-options-plist $CM_BUILD_DIR/export_options.plist
-
-          # 打印输出目录信息，便于调试
-          echo "IPA 文件可能位于: $CM_BUILD_DIR/build/ios/ipa"
-          ls -la $CM_BUILD_DIR/build/ios/ipa/
-
       # 创建导出选项文件（可选但推荐）
       # 这个脚本会在项目根目录生成一个 export_options.plist 文件，
       # 用于指定分发方式（与 ios_signing.distribution_type 保持一致）
@@ -71,6 +58,19 @@ workflows:
           </plist>
           EOL
         # 注意：此步骤必须在 'flutter build ipa' 之前运行，所以我把它的名字放在前面，但执行顺序由 codemagic 保证（根据定义顺序）
+
+      # iOS 构建 - 完全重写
+      - name: Build iOS IPA
+        script: |
+          # 关键：使用 'flutter build ipa' 命令而不是 'flutter build ios'
+          # 'flutter build ipa' 会处理整个流程：编译、签名并导出为 .ipa 文件
+          # --export-options-plist 是可选的，但可以用来精确控制导出行为
+          flutter build ipa --release --no-tree-shake-icons \
+            --export-options-plist $CM_BUILD_DIR/export_options.plist
+
+          # 打印输出目录信息，便于调试
+          echo "IPA 文件可能位于: $CM_BUILD_DIR/build/ios/ipa"
+          ls -la $CM_BUILD_DIR/build/ios/ipa/
 
     artifacts:
       - build/app/outputs/flutter-apk/**/*.apk
