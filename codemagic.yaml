@@ -11,8 +11,12 @@ workflows:
 
       # 使用自动代码签名
       ios_signing:
-        distribution_type: ad_hoc
-        bundle_identifier: com.ccgametest.live
+        #distribution_type: ad_hoc
+        #bundle_identifier: com.ccgametest.live
+        provisioning_profiles:
+          - cc_game_prod_profile
+        certificates:
+          - cc_game_prod_cer
 
     cache:
       cache_paths:
