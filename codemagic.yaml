@@ -13,7 +13,9 @@ workflows:
       ios_signing:
         distribution_type: ad_hoc
         bundle_identifier: com.ccgametest.live
-        # 确保在 Codemagic Web 界面配置了自动代码签名
+        # 引用您在 Codemagic 中上传的证书
+        certificate: $CM_CERTIFICATE
+        provisioning_profile: $CM_PROVISIONING_PROFILE
 
     cache:
       cache_paths:
