@@ -14,6 +14,7 @@ workflows:
       ios_signing:
         # 指定分发类型
         distribution_type: ad_hoc # 可选: ad_hoc, app_store, development, enterprise
+        bundle_identifier: com.ccgametest.live
         # 确保在 Codemagic Web 界面中配置了自动代码签名
 
     cache:
@@ -29,20 +30,6 @@ workflows:
       - name: Check Flutter environment
         script: |
           flutter doctor -v
-
-      # 设置 Bundle Identifier 和代码签名
-      - name: Set up iOS code signing
-        script: |
-          echo "设置 Bundle Identifier..."
-          plutil -replace CFBundleIdentifier -string "com.ccgametest.live" ios/Runner/Info.plist
-          
-          echo "应用代码签名设置..."
-          # 确保使用正确的团队ID
-          /usr/libexec/PlistBuddy -c "Set :teamID X9A9C8FGQ6" "$CM_BUILD_DIR/export_options.plist" 2>/dev/null || true
-          
-          # 显示当前配置
-          echo "当前 Bundle Identifier:"
-          plutil -extract CFBundleIdentifier xml1 -o - ios/Runner/Info.plist
 
       # Android 构建
       - name: Build Android APK
