@@ -13,7 +13,6 @@ workflows:
       ios_signing:
         distribution_type: ad_hoc
         bundle_identifier: com.ccgametest.live
-        # 确保在 Codemagic Web 界面配置了自动代码签名
 
     cache:
       cache_paths:
@@ -28,11 +27,6 @@ workflows:
       - name: Check Flutter environment
         script: |
           flutter doctor -v
-
-      # 先设置代码签名证书
-      - name: Set up code signing
-        script: |
-          keychain initialize
 
       # Android 构建
       - name: Build Android APK
@@ -60,6 +54,11 @@ workflows:
             <false/>
             <key>uploadSymbols</key>
             <true/>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>com.ccgametest.live</key>
+              <string>cc_game_prod_profile</string>
+            </dict>
           </dict>
           </plist>
           EOL
