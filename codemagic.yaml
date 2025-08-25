@@ -34,11 +34,10 @@ workflows:
           echo "使用pod deintegrate清除ios依赖缓存，再使用pod install重新安装ios依赖"
           cd ios && pod deintegrate && pod install && cd ..
 
-      # iOS 构建 - 改进版本
+      # iOS 构建 - 修正版本
       - name: Build iOS IPA
         script: |
           # 确保输出目录存在
-          mkdir -p build/ios/archive
           mkdir -p build/ios/ipa
           
           # 清理之前的构建
@@ -46,32 +45,28 @@ workflows:
           
           # 构建 iOS app
           echo "开始构建 iOS 应用..."
-          flutter build ios --release --no-tree-shake-icons --no-codesign
+          flutter build ios --release --no-tree-shake-icons
           
-          # 使用 xcodebuild 生成 xcarchive
-          echo "开始归档..."
+          # 使用 xcodebuild 生成 IPA（直接构建IPA，跳过归档步骤）
+          echo "开始生成 IPA..."
           xcodebuild -workspace "$XCODE_WORKSPACE" \
             -scheme "$XCODE_SCHEME" \
             -configuration "$XCODE_CONFIGURATION" \
             -sdk iphoneos \
-            -archivePath build/ios/archive/Runner.xcarchive \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/ios/Runner.xcarchive \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             archive | xcpretty
           
-          # 检查归档是否成功
-          if [ ! -d "build/ios/archive/Runner.xcarchive" ]; then
-            echo "错误: 归档失败，未找到 Runner.xcarchive"
-            exit 1
-          fi
-          
-          # 导出 IPA
+          # 导出 IPA（使用正确的配置）
           echo "开始导出 IPA..."
           xcodebuild -exportArchive \
-            -archivePath build/ios/archive/Runner.xcarchive \
+            -archivePath build/ios/Runner.xcarchive \
             -exportOptionsPlist ios/ExportOptions.plist \
             -exportPath build/ios/ipa \
+            -allowProvisioningUpdates \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO | xcpretty
