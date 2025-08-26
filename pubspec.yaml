@@ -18,12 +18,13 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
-#  webview_flutter_plus: ^0.4.18
+  # webview_flutter_plus: ^0.4.18
   flutter_inappwebview: ^6.1.5
   image_picker: ^1.1.2
-  # dart run flutter_native_splash:create --path=./flutter_native_splash.yaml
+  # yaml文件创建好后直接执行：dart run flutter_native_splash:create --path=./flutter_native_splash.yaml 使启动图生效
   flutter_native_splash: ^2.4.6
-  # dart run flutter_launcher_icons:generate
+  # yaml文件不存在先执行生成yaml文件：dart run flutter_launcher_icons:generate
+  # 编辑yaml文件后直接执行：dart run flutter_launcher_icons 使图标生效
   flutter_launcher_icons: ^0.14.4
   # 极光推送国际版 - (官方源码没有同步最新版flutter android模块所需配置，这里直接以源码形式引入并修改其配置)
   flutter_plugin_engagelab:
