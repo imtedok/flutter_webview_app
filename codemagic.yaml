@@ -16,10 +16,14 @@ workflows:
         bundle_identifier: com.ccgametest.live
       vars:
         PACKAGE_NAME: "com.ccgametest.live"
+        # 自定义应用版本号
+        APP_VERSION: "1.0.1"
+        # 自定义应用构建号
+        BUILD_NUMBER: "1"
         # 自定义应用名称
         APP_NAME: "CC GAME 1"
-        # 自定义待加载的 web 网址
-        WEB_URL: "https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev"
+        # 自定义待加载的 web 网址 以及 网址中用来请求的api链接
+        WEB_URL: "https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev?baseUrl=https://9212-bankski-game-v1h88uwaamm.ws-us121.gitpod.io"
         # 自定义待加载的极光推送的 JPUSH_APP_KEY
         JPUSH_APP_KEY: "8b68b9303424eadca9e99ae9"
 
@@ -74,7 +78,9 @@ workflows:
       # android. 打包构建安卓apk
       - name: Build apk with Flutter
         script: |
-          flutter build apk --no-tree-shake-icons --split-per-abi
+          flutter build apk \
+            --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}" \
+            --no-tree-shake-icons --split-per-abi
 
       # ios. 安装 Pods
       - name: Install pods
@@ -85,7 +91,7 @@ workflows:
       - name: Build ipa with Flutter
         script: |
           flutter build ipa --release \
-            --build-name=1.0.0 \
+            --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}" \
             --export-options-plist=/Users/builder/export_options.plist
 
     artifacts:

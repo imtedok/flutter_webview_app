@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_plugin_engagelab/flutter_plugin_engagelab.dart';
+import 'package:game_shell_engine/webUrl.dart';
 
 import 'WebControllerUtil.dart';
 
@@ -18,7 +19,7 @@ class JPushUtil {
   /// 测试
   // static const JPUSH_APP_KEY = 'f2ce36eb5892b8c954a301e7';
   /// 线上
-  static const JPUSH_APP_KEY = '8b68b9303424eadca9e99ae9';
+  static const JPUSH_APP_KEY = jpushAppKey;
 
   Map<String, dynamic>? needPushMsg;
 
