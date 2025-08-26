@@ -21,8 +21,14 @@ dependencies:
   # webview_flutter_plus: ^0.4.18
   flutter_inappwebview: ^6.1.5
   image_picker: ^1.1.2
+  # 设置app名称
+  # 直接执行：dart run rename_app:main all="My App Name"
+  # 单个平台单独设置名称执行：dart run rename_app:main android="Anroid Name" ios="IOS Name" others="Others Name"
+  rename_app: ^1.6.5
+  # 设置app启动图
   # yaml文件创建好后直接执行：dart run flutter_native_splash:create --path=./flutter_native_splash.yaml 使启动图生效
   flutter_native_splash: ^2.4.6
+  # 设置app图标
   # yaml文件不存在先执行生成yaml文件：dart run flutter_launcher_icons:generate
   # 编辑yaml文件后直接执行：dart run flutter_launcher_icons 使图标生效
   flutter_launcher_icons: ^0.14.4
@@ -43,6 +49,11 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  # 此插件用于快速修改包名
+  # 修改所有平台包名，执行：dart run change_app_package_name:main com.new.package.name
+  # 修改android包名，执行：dart run change_app_package_name:main com.new.package.name --android
+  # 修改ios包名，执行：dart run change_app_package_name:main com.new.package.name --ios
+  change_app_package_name: ^1.5.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
