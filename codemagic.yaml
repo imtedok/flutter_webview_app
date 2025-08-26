@@ -9,6 +9,7 @@ workflows:
         - cc_game_apk_jks
       vars:
         PACKAGE_NAME: "com.ccgametest.live"
+        PROJECT_NAME: "game_shell_engine"
         APP_NAME: "CC GAME 1"               # 自定义应用名称
         API_URL: "https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev" # web 网页地址
       flutter: stable
@@ -22,7 +23,7 @@ workflows:
       - name: Update app name
         script: |
           echo "Updating app name..."
-          sed -i '' "s/name: .*/name: ${APP_NAME}/" pubspec.yaml
+          sed -i '' "s/name: .*/name: ${PROJECT_NAME}/" pubspec.yaml
           # Android清单文件
           sed -i '' "s/android:label=\"[^\"]*\"/android:label=\"${APP_NAME}\"/" android/app/src/main/AndroidManifest.xml
 
