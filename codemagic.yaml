@@ -1,80 +1,113 @@
 workflows:
-  flutter_webview_app:
-    name: Flutter WebView App
-    max_build_duration: 60
+  android-workflow:
+    name: Android Workflow
+    instance_type: mac_mini_m2
+    max_build_duration: 120
     environment:
-      groups:
-        - base # 包含 PGYER_UKEY 和 PGYER_API_KEY
+      android_signing:
+        - cc_game_apk_jks
+      vars:
+        PACKAGE_NAME: "com.ccgametest.live" # <-- Put your package name here
       flutter: stable
-      xcode: latest
-      cocoapods: default
-
-      # 使用自动代码签名
-      ios_signing:
-        #distribution_type: ad_hoc
-        #bundle_identifier: com.ccgametest.live
-        provisioning_profiles:
-          - cc_game_prod_profile
-        certificates:
-          - cc_game_prod_cer
-
-    cache:
-      cache_paths:
-        - $HOME/.pub-cache
-        - $HOME/.gradle/caches
-
     scripts:
-      - name: Install dependencies
+      - name: Set up local.properties
         script: |
-          flutter pub get
-
-      - name: Check Flutter environment
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+      - name: Get Flutter packages
         script: |
-          flutter doctor -v
-
-      # Android 构建
-      - name: Build Android APK
+          flutter packages pub get
+      - name: Build apk with Flutter
         script: |
           flutter build apk --no-tree-shake-icons --split-per-abi
-
-      # iOS 构建
-      - name: Build iOS IPA
-        script: |
-          echo "构建 iOS IPA..."
-          flutter build ipa --obfuscate --split-debug-info=../build_output --export-method ad-hoc
-
     artifacts:
       - build/app/outputs/flutter-apk/**/*.apk
-      - build/ios/ipa/*.ipa
-
+      - build/**/outputs/**/mapping.txt
+      - flutter_drive.log
     publishing:
       email:
         recipients:
           - xs121913958@163.com
+        notify:
+          success: true
+          failure: false
+  ios-workflow:
+    name: iOS Workflow
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+    integrations:
+      app_store_connect: codemagic
+    environment:
+      ios_signing:
+        distribution_type: ad_hoc # or: ad_hoc | app_store | development | enterprise
+        bundle_identifier: com.ccgametest.live
+      flutter: stable
+      xcode: latest # <-- set to specific version e.g. 14.3, 15.0 to avoid unexpected updates.
+      cocoapods: default
+    scripts:
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+      - name: Flutter build ipa
+        script: |
+          flutter build ipa --release \
+            --build-name=1.0.0 \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+    publishing:
+      # See the following link for details about email publishing - https://docs.codemagic.io/publishing-yaml/distribution/#email
+      email:
+        recipients:
+          - xs121913958@163.com
+        notify:
+          success: true # To receive a notification when a build succeeds
+          failure: false # To not receive a notification when a build fails
+      app_store_connect:
+        auth: integration
 
-      scripts:
-        - name: Upload to Pgyer
-          script: |
-            # 上传 Android APK
-            for apk in $(find build/app/outputs/flutter-apk -name "*.apk"); do
-              echo "上传 Android APK: $apk 到蒲公英..."
-              curl -F "file=@$apk" \
-                   -F "uKey=$PGYER_UKEY" \
-                   -F "_api_key=$PGYER_API_KEY" \
-                   https://www.pgyer.com/apiv2/app/upload
-              echo ""
-            done
+        # Configuration related to TestFlight (optional)
+        # Note: This action is performed during post-processing.
+        submit_to_testflight: false
+        beta_groups: # Specify the names of beta tester groups that will get access to the build once it has passed beta review.
+          - group name 1
+          - group name 2
 
-            # 上传 iOS IPA
-            IPA_PATH="$CM_BUILD_DIR/build/ios/ipa/Runner.ipa"
-            if [ -f "$IPA_PATH" ]; then
-              echo "上传 iOS IPA 到蒲公英..."
-              curl -F "file=@$IPA_PATH" \
-                   -F "uKey=$PGYER_UKEY" \
-                   -F "_api_key=$PGYER_API_KEY" \
-                   https://www.pgyer.com/apiv2/app/upload
-            else
-              echo "警告: 未找到 IPA 文件 $IPA_PATH"
-              # 尝试查找任何 IPA 文件
-              find $CM_BUILD_DIR -name "*.ipa" -exec echo "找到IPA文件: {}" \;
-            fi
+        # Configuration related to App Store (optional)
+        # Note: This action is performed during post-processing.
+        submit_to_app_store: false
+
+  web-workflow:
+    name: Web app workflow
+    max_build_duration: 10
+    environment:
+      flutter: stable
+    scripts:
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      - name: Flutter analyze
+        script: |
+          flutter analyze
+      - name: Flutter unit tests
+        script: |
+          flutter test
+      - name: Flutter build webapp
+        script: |
+          flutter build web --release
+          cd build/web
+          7z a -r ../web.zip ./*
+    artifacts:
+      - build/web.zip
+      - flutter_drive.log
+    publishing:
+      email:
+        recipients:
+          - xs121913958@163.com
