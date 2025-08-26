@@ -31,6 +31,7 @@ workflows:
         notify:
           success: true
           failure: false
+
   # 苹果构建流水线
   ios-workflow:
     name: iOS Workflow
@@ -72,22 +73,8 @@ workflows:
         notify:
           success: true # To receive a notification when a build succeeds
           failure: false # To not receive a notification when a build fails
-      # 注释掉上传testflight步骤和app_store步骤
-      #app_store_connect:
-        #auth: integration
 
-        # Configuration related to TestFlight (optional)
-        # Note: This action is performed during post-processing.
-        #submit_to_testflight: false
-        # Specify the names of beta tester groups that will get access to the build once it has passed beta review.
-        #beta_groups:
-          #- group name 1
-          #- group name 2
-
-        # Configuration related to App Store (optional)
-        # Note: This action is performed during post-processing.
-        #submit_to_app_store: false
-
+  # web构建流水线
   web-workflow:
     name: Web app workflow
     max_build_duration: 10
