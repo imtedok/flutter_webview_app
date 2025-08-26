@@ -49,7 +49,7 @@ workflows:
           dart run rename_app:main all="${APP_NAME}"
 
       # flutter：更新用户图标，此步骤需先在flutter项目中更新图标资源文件后才能应用新图标
-      - name: Replace app icons
+      - name: Update app icons
         script: |
           echo "Update icons..."
           dart run flutter_launcher_icons
@@ -69,7 +69,7 @@ workflows:
               -e "s#const String jpushAppKey = \".*\";#const String jpushAppKey = \"${JPUSH_APP_KEY}\";#" \
               lib/webUrl.dart
           echo "Verifying updated variables..."
-          grep -nE "webUrl|jpushAppKey" lib/config.dart
+          grep -nE "webUrl|jpushAppKey" lib/webUrl.dart
 
       # android. 打包安卓apk
       - name: Build apk with Flutter
