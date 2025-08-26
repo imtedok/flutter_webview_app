@@ -8,18 +8,53 @@ workflows:
       android_signing:
         - cc_game_apk_jks
       vars:
-        PACKAGE_NAME: "com.ccgametest.live" # <-- Put your package name here
+        PACKAGE_NAME: "com.ccgametest.live"
+        APP_NAME: "CC GAME 1"               # 自定义应用名称
+        API_URL: "https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev" # web 网页地址
       flutter: stable
     scripts:
+      # 1. 配置local.properties
       - name: Set up local.properties
         script: |
           echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+
+      # 2. 动态修改应用名称
+      - name: Update app name
+        script: |
+          echo "Updating app name..."
+          sed -i '' "s/name: .*/name: ${APP_NAME}/" pubspec.yaml
+          # Android清单文件
+          sed -i '' "s/android:label=\"[^\"]*\"/android:label=\"${APP_NAME}\"/" android/app/src/main/AndroidManifest.xml
+
+      # 3. 动态替换图标
+      - name: Replace app icons
+        script: |
+          echo "Replacing icons..."
+          # 假设你把新图标上传到 assets/icons/ 目录
+          cp -rf assets/icons/android/* android/app/src/main/res/
+
+      # 4. 更新启动页资源
+      - name: Update splash screen
+        script: |
+          echo "Updating splash screen..."
+          cp -rf assets/splash/android/* android/app/src/main/res/drawable/
+
+      # 5. 替换项目 API 地址
+      - name: Update API endpoint
+        script: |
+          echo "Replacing API URL..."
+          find lib -type f -name "webUrl.dart" -exec sed -i '' "s#https://new\.ccgametest\.live#${API_URL}#g" {} \;
+
+      # 6. 获取依赖
       - name: Get Flutter packages
         script: |
           flutter packages pub get
+
+      # 7. 打包安卓apk
       - name: Build apk with Flutter
         script: |
           flutter build apk --no-tree-shake-icons --split-per-abi
+
     artifacts:
       - build/app/outputs/flutter-apk/**/*.apk
       - build/**/outputs/**/mapping.txt
@@ -41,62 +76,61 @@ workflows:
       app_store_connect: for_codemagic
     environment:
       ios_signing:
-        distribution_type: ad_hoc # or: ad_hoc | app_store | development | enterprise
+        distribution_type: ad_hoc
         bundle_identifier: com.ccgametest.live
       flutter: stable
-      xcode: latest # <-- set to specific version e.g. 14.3, 15.0 to avoid unexpected updates.
+      xcode: latest
       cocoapods: default
     scripts:
+      # 1. 设置签名
       - name: Set up code signing settings on Xcode project
         script: |
           xcode-project use-profiles
+
+      # 2. 修改应用名称
+      - name: Update app name
+        script: |
+          echo "Updating iOS app name..."
+          /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName ${APP_NAME}" ios/Runner/Info.plist
+
+      # 3. 替换应用图标
+      - name: Replace app icons
+        script: |
+          echo "Replacing iOS icons..."
+          cp -rf assets/icons/ios/* ios/Runner/Assets.xcassets/AppIcon.appiconset/
+
+      # 4. 更新启动页资源
+      - name: Update splash screen
+        script: |
+          echo "Updating splash screen..."
+          cp -rf assets/splash/ios/* ios/Runner/Assets.xcassets/LaunchImage.imageset/
+
+      # 5. 替换API地址
+      - name: Update API endpoint
+        script: |
+          echo "Replacing API URL..."
+          find lib -type f -name "webUrl.dart" -exec sed -i '' "s#https://new\.ccgametest\.live#${API_URL}#g" {} \;
+
+      # 6. 获取Flutter依赖
       - name: Get Flutter packages
         script: |
           flutter packages pub get
+
+      # 7. 安装 Pods
       - name: Install pods
         script: |
           find . -name "Podfile" -execdir pod install \;
+
+      # 8. 构建ipa
       - name: Flutter build ipa
         script: |
           flutter build ipa --release \
             --build-name=1.0.0 \
             --export-options-plist=/Users/builder/export_options.plist
+
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
-      - flutter_drive.log
-    publishing:
-      # See the following link for details about email publishing - https://docs.codemagic.io/publishing-yaml/distribution/#email
-      email:
-        recipients:
-          - xs121913958@163.com
-        notify:
-          success: true # To receive a notification when a build succeeds
-          failure: false # To not receive a notification when a build fails
-
-  # web构建流水线
-  web-workflow:
-    name: Web app workflow
-    max_build_duration: 10
-    environment:
-      flutter: stable
-    scripts:
-      - name: Get Flutter packages
-        script: |
-          flutter packages pub get
-      - name: Flutter analyze
-        script: |
-          flutter analyze
-      - name: Flutter unit tests
-        script: |
-          flutter test
-      - name: Flutter build webapp
-        script: |
-          flutter build web --release
-          cd build/web
-          7z a -r ../web.zip ./*
-    artifacts:
-      - build/web.zip
       - flutter_drive.log
     publishing:
       email:

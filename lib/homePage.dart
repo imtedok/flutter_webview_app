@@ -8,6 +8,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:game_shell_engine/utils/WebControllerUtil.dart';
 import 'package:game_shell_engine/utils/jpushUtil.dart';
+import 'package:game_shell_engine/webUrl.dart';
 import 'package:game_shell_engine/windowPopup.dart';
 import 'package:intl/intl.dart';
 
@@ -138,11 +139,7 @@ class _HomePageState extends State<HomePage> {
                     child: InAppWebView(
                       key: webViewKey,
                       initialUrlRequest: URLRequest(
-                        /// WebUri('https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev')
-                        /// WebUri('http://192.168.18.182')
-                        /// WebUri('https://www.kkgametop.xyz')
-                        /// WebUri('https://www.ccgametest.live')
-                        url: WebUri('https://new.ccgametest.live'),
+                        url: WebUri(webUrl),
                       ),
                       initialSettings: InAppWebViewSettings(
                         javaScriptEnabled: true,
