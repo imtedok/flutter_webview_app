@@ -71,7 +71,6 @@ workflows:
           echo "Verifying updated variables..."
           grep -nE "webUrl|jpushAppKey" lib/config.dart
 
-
       # android. 打包安卓apk
       - name: Build apk with Flutter
         script: |
