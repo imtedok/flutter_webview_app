@@ -1,133 +1,88 @@
 workflows:
-  # 安卓构建流水线
-  android-workflow:
-    name: Android Workflow
-    instance_type: mac_mini_m2
-    max_build_duration: 120
-    environment:
-      android_signing:
-        - cc_game_apk_jks
-      vars:
-        PACKAGE_NAME: "com.ccgametest.live"
-        PROJECT_NAME: "game_shell_engine"
-        APP_NAME: "CC GAME 1"               # 自定义应用名称
-        API_URL: "https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev" # web 网页地址
-      flutter: stable
-    scripts:
-      # 1. 配置local.properties
-      - name: Set up local.properties
-        script: |
-          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
-
-      # 2. 动态修改应用名称
-      - name: Update app name
-        script: |
-          echo "Updating app name..."
-          sed -i '' "s/name: .*/name: ${PROJECT_NAME}/" pubspec.yaml
-          # Android清单文件
-          sed -i '' "s/android:label=\"[^\"]*\"/android:label=\"${APP_NAME}\"/" android/app/src/main/AndroidManifest.xml
-
-      # 3. 动态替换图标
-      - name: Replace app icons
-        script: |
-          echo "Replacing icons..."
-          # 假设你把新图标上传到 assets/icons/ 目录
-          cp -rf assets/icons/android/* android/app/src/main/res/
-
-      # 4. 更新启动页资源
-      - name: Update splash screen
-        script: |
-          echo "Updating splash screen..."
-          cp -rf assets/splash/android/* android/app/src/main/res/drawable/
-
-      # 5. 替换项目 API 地址
-      - name: Update API endpoint
-        script: |
-          echo "Replacing API URL..."
-          find lib -type f -name "webUrl.dart" -exec sed -i '' "s#https://new\.ccgametest\.live#${API_URL}#g" {} \;
-
-      # 6. 获取依赖
-      - name: Get Flutter packages
-        script: |
-          flutter packages pub get
-
-      # 7. 打包安卓apk
-      - name: Build apk with Flutter
-        script: |
-          flutter build apk --no-tree-shake-icons --split-per-abi
-
-    artifacts:
-      - build/app/outputs/flutter-apk/**/*.apk
-      - build/**/outputs/**/mapping.txt
-      - flutter_drive.log
-    publishing:
-      email:
-        recipients:
-          - xs121913958@163.com
-        notify:
-          success: true
-          failure: false
-
-  # 苹果构建流水线
-  ios-workflow:
-    name: iOS Workflow
+  # Flutter构建流水线
+  flutter-workflow:
+    name: Flutter Workflow
     instance_type: mac_mini_m2
     max_build_duration: 120
     integrations:
       app_store_connect: for_codemagic
     environment:
+      # android签名信息
+      android_signing:
+        - cc_game_apk_jks
+      # ios签名信息
       ios_signing:
         distribution_type: ad_hoc
         bundle_identifier: com.ccgametest.live
       vars:
         PACKAGE_NAME: "com.ccgametest.live"
-        PROJECT_NAME: "game_shell_engine"
-        APP_NAME: "CC GAME 1"               # 自定义应用名称
-        API_URL: "https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev" # web 网页地址
+        # 自定义应用名称
+        APP_NAME: "CC GAME 1"
+        # 自定义待加载的 web 网址
+        WEB_URL: "https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev"
+        # 自定义待加载的极光推送的 JPUSH_APP_KEY
+        JPUSH_APP_KEY: "8b68b9303424eadca9e99ae9"
+
       flutter: stable
       xcode: latest
       cocoapods: default
     scripts:
-      # 1. 设置签名
+      # android. 配置local.properties
+      - name: Set up local.properties
+        script: |
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+
+      # ios. 设置签名
       - name: Set up code signing settings on Xcode project
         script: |
           xcode-project use-profiles
 
-      # 2. 修改应用名称
-      - name: Update app name
-        script: |
-          echo "Updating iOS app name..."
-          /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName ${APP_NAME}" ios/Runner/Info.plist
-
-      # 3. 替换应用图标
-      - name: Replace app icons
-        script: |
-          echo "Replacing iOS icons..."
-          cp -rf assets/icons/ios/* ios/Runner/Assets.xcassets/AppIcon.appiconset/
-
-      # 4. 更新启动页资源
-      - name: Update splash screen
-        script: |
-          echo "Updating splash screen..."
-          cp -rf assets/splash/ios/* ios/Runner/Assets.xcassets/LaunchImage.imageset/
-
-      # 5. 替换API地址
-      - name: Update API endpoint
-        script: |
-          echo "Replacing API URL..."
-          find lib -type f -name "webUrl.dart" -exec sed -i '' "s#https://new\.ccgametest\.live#${API_URL}#g" {} \;
-
-      # 6. 获取Flutter依赖
+      # 获取Flutter依赖
       - name: Get Flutter packages
         script: |
           flutter packages pub get
 
-      # 7. 安装 Pods
+      # flutter：更新应用名称
+      - name: Update app name
+        script: |
+          echo "Updating app name..."
+          dart run rename_app:main all="${APP_NAME}"
+
+      # flutter：更新用户图标，此步骤需先在flutter项目中更新图标资源文件后才能应用新图标
+      - name: Replace app icons
+        script: |
+          echo "Update icons..."
+          dart run flutter_launcher_icons
+
+      # flutter：更新启动图资源，此步骤需先在flutter项目中更新启动页资源文件后才能应用新的启动图
+      - name: Update splash screen
+        script: |
+          echo "Updating splash screen..."
+          dart run flutter_native_splash:create --path=./flutter_native_splash.yaml
+
+      # flutter：更新项目 webUrl.dart 文件中的内容
+      - name: Update WEB endpoint
+        script: |
+          echo "Update webUrl.dart..."
+          sed -i '' \
+              -e "s#const String webUrl = \".*\";#const String webUrl = \"${WEB_URL}\";#" \
+              -e "s#const String jpushAppKey = \".*\";#const String jpushAppKey = \"${JPUSH_APP_KEY}\";#" \
+              lib/webUrl.dart
+          echo "Verifying updated variables..."
+          grep -nE "webUrl|jpushAppKey" lib/config.dart
+
+
+      # android. 打包安卓apk
+      - name: Build apk with Flutter
+        script: |
+          flutter build apk --no-tree-shake-icons --split-per-abi
+
+      # ios. 安装 Pods
       - name: Install pods
         script: |
           find . -name "Podfile" -execdir pod install \;
 
-      # 8. 构建ipa
+      # ios. 构建ipa
       - name: Flutter build ipa
         script: |
           flutter build ipa --release \
@@ -135,6 +90,8 @@ workflows:
             --export-options-plist=/Users/builder/export_options.plist
 
     artifacts:
+      - build/app/outputs/flutter-apk/**/*.apk
+      - build/**/outputs/**/mapping.txt
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
       - flutter_drive.log
