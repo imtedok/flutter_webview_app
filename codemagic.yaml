@@ -48,6 +48,13 @@ workflows:
         script: |
           flutter packages pub get
 
+      # flutter：修改应用包名（android、ios），此步骤修改之后会影响推送且ios会无法出包，
+      # 请定位至 bundle_identifier，PACKAGE_NAME、JPUSH_APP_KEY等变量处对照处理后再执行打包脚本
+      - name: Update android ios package name
+        script: |
+          echo "Update android ios package name..."
+          dart run change_app_package_name:main "${PACKAGE_NAME}"
+
       # flutter：更新应用名称
       - name: Update app name
         script: |
