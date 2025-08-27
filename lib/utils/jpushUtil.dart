@@ -160,7 +160,7 @@ class JPushUtil {
     }
 
     // todo 暂时注释掉
-    // await _getRegistrationID();
+    await _getRegistrationID();
   }
 
   void _doNext(Map<String, dynamic> data) {

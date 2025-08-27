@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:draggable_float_widget/draggable_float_widget.dart';
@@ -11,6 +12,9 @@ import 'package:game_shell_engine/utils/jpushUtil.dart';
 import 'package:game_shell_engine/webUrl.dart';
 import 'package:game_shell_engine/windowPopup.dart';
 import 'package:intl/intl.dart';
+
+const userName = 'gamedev';
+const password = 'gamedev';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -79,7 +83,7 @@ class _HomePageState extends State<HomePage> {
       // 加载悬浮刷新按钮
       _showOverlay();
       /// 初始化极光推送国际版
-      JPushUtil().initJPush();
+      // JPushUtil().initJPush();
     });
     pullToRefreshController = kIsWeb
         ? null
@@ -140,6 +144,11 @@ class _HomePageState extends State<HomePage> {
                       key: webViewKey,
                       initialUrlRequest: URLRequest(
                         url: WebUri(webUrl),
+                        headers: {
+                          /// 由于网址所在的服务器开启了 HTTP Basic Authentication（auth_basic "Authentication";），需要在请求头中绑定认证的账号密码
+                          /// 格式为 Authorization: Basic <Base64(username:password)>
+                          "Authorization": 'Basic ${base64Encode(utf8.encode('$userName:$password'))}'
+                        }
                       ),
                       initialSettings: InAppWebViewSettings(
                         javaScriptEnabled: true,
@@ -168,6 +177,15 @@ class _HomePageState extends State<HomePage> {
                         WebControllerUtil().isUrlLoadStop = true;
                         WebControllerUtil().evaluateJavascript();
                       },
+                      onReceivedHttpAuthRequest: (controller, challenge) async {
+                        // 自动返回用户名和密码
+                        return HttpAuthResponse(
+                          username: userName,
+                          password: password,
+                          action: HttpAuthResponseAction.PROCEED,
+                          permanentPersistence: true,
+                        );
+                      },
                       onReceivedError: (controller, request, error) {
                         /// 链接加载出错时回调
                         /// 同时关掉闪屏页
@@ -195,17 +213,10 @@ class _HomePageState extends State<HomePage> {
                               'navigationAction = ${navigationAction.toString()}');
                         }
                         final uri = navigationAction.request.url;
-                        if ((uri
-                                    ?.toString()
-                                    .startsWith('https://www.kkgametop.xyz') ??
-                                false) ||
-                            (uri
-                                    ?.toString()
-                                    .startsWith('http://192.168.18.182') ??
-                                false) ||
-                            (uri?.toString().startsWith(
-                                    'https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev') ??
-                                false)) {
+                        if ((uri?.toString().startsWith('https://www.kkgametop.xyz') ?? false)
+                            || (uri?.toString().startsWith('http://192.168.18.182') ?? false)
+                            || (uri?.toString().startsWith('https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev') ?? false)
+                            || (uri?.toString().startsWith(webUrl) ?? false)) {
                           /// 放行
                           return Future(
                             () => NavigationActionPolicy.ALLOW,
