@@ -127,7 +127,7 @@ class JPushUtil {
 
       if (eventName == "onNotificationArrived" ||
           eventName == "willPresentNotification") {
-        // todo 推送通知栏新消息，tips：当通知栏被关闭时手机状态栏不会出现通知消息，只有app运行位于前台时会触发此回调
+        // 推送通知栏新消息，tips：当通知栏被关闭时手机状态栏不会出现通知消息，只有app运行位于前台时会触发此回调
         // 安卓收到的消息数据：{event_name: onNotificationArrived, event_data: {"badge":1,"bigPicture":"","bigText":"","builderId":0,"category":"","channelId":"","content":"恭喜您中奖了","defaults":0,"extras":{"name":"tox"},"inbox":[],"intentSsl":"","intentUri":"","largeIcon":"","messageId":"558497131","notificationId":558497131,"overrideMessageId":"","platform":0,"platformMessageId":"","priority":0,"smallIcon":"","sound":"","style":0,"title":"通知"}}
         // 苹果收到的消息数据：{event_name: willPresentNotification, event_data: {"_j_msgid":561712896,"_j_business":1,"_j_engagel_cloud":1,"_j_uid":40011962683,"aps":{"mutable-content":1,"alert":{"title":"重要通知","body":"您有一份大餐即将送达，请注意查收！！！"},"badge":2,"sound":"default"},"foodName":"大盘鸡","inapp":{"inapp_end_time":1750485066112},"price":"200","extras":{"inapp":{"inapp_end_time":1750485066112},"_j_engagel_cloud":1,"price":"200","foodName":"大盘鸡"}}}
         // _doNext(eventData);
@@ -136,7 +136,7 @@ class JPushUtil {
         WebControllerUtil().evaluateJavascript();
       } else if (eventName == "onNotificationClicked" ||
           eventName == "didReceiveNotificationResponse") {
-        // todo 点击通知栏消息，在此时通常可以做一些页面跳转等
+        // 点击通知栏消息，在此时通常可以做一些页面跳转等
         // _doNext(eventData);
         needPushMsg = eventData;
         WebControllerUtil().evaluateJavascript();
