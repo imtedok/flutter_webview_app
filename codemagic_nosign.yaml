@@ -11,7 +11,7 @@ workflows:
       vars:
         # 自定义包名，修改后影响较大
         # ios推送证书未知，android需更新推送平台信息
-        PACKAGE_NAME: "com.ccgametest.live"
+        PACKAGE_NAME: "com.ccgametest.life"
         # 自定义待加载的极光推送的 JPUSH_APP_KEY【与 PACKAGE_NAME 包名高度绑定，一旦包名变更，此值也须变更，主要受推送平台影响】
         JPUSH_APP_KEY: "8b68b9303424eadca9e99ae9"
         # 自定义应用版本号
