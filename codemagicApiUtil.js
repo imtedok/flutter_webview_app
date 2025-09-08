@@ -1,6 +1,8 @@
 import axios from "axios";
 
+// 流水线一：Andorid正常出包、ios打签名包
 const workflowId = "flutter-workflow"
+// 流水线一：Andorid正常出包、ios打非签名包
 const workflowIdNoSign = "flutter-workflow-nosign"
 const branch = "master"
 const service = axios.create({
@@ -201,6 +203,7 @@ export const testWorkflow = async () => {
         // 通过 getApps 可获取
         "appId": apps?.applications[0]?._id,
         "workflowId": workflowId,
+//        "workflowId": workflowIdNoSign,
         "branch": branch,
     })
     console.log("2.runBuild =", buildId)
