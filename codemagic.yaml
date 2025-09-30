@@ -4,8 +4,8 @@ workflows:
     name: Flutter Workflow
     instance_type: mac_mini_m2
     max_build_duration: 120
-    integrations:
-      app_store_connect: for_codemagic
+    # integrations:
+    #   app_store_connect: for_codemagic
     environment:
       # android签名信息
       android_signing:
