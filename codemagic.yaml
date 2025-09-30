@@ -11,10 +11,10 @@ workflows:
       android_signing:
         - cc_game_apk_jks
       # ios签名信息
-      ios_signing:
-        distribution_type: ad_hoc
-        # ios 包名必须指定，请注意跟 PACKAGE_NAME 须保持一致
-        bundle_identifier: com.ccgametest.live
+      # ios_signing:
+      #   distribution_type: ad_hoc
+      #   # ios 包名必须指定，请注意跟 PACKAGE_NAME 须保持一致
+      #   bundle_identifier: com.ccgametest.live
       vars:
         # 自定义包名，修改后影响较大
         # （ios得事先在苹果开发者平台添加指定包名以及描述文件以及推送证书，并上传codemagic以及推送平台，android只需更新推送平台信息）
@@ -26,7 +26,7 @@ workflows:
         # 自定义应用构建号
         BUILD_NUMBER: "1"
         # 自定义应用名称
-        APP_NAME: "CC GAME 1"
+        APP_NAME: "CC GAME 2"
         # 自定义待加载的 web 网址 以及 网址中用来请求的api链接
         WEB_URL: "https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev?baseUrl=https://9212-bankski-game-v1h88uwaamm.ws-us121.gitpod.io"
 
@@ -40,9 +40,9 @@ workflows:
           echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
 
       # ios. 设置签名
-      - name: Set up code signing settings on Xcode project
-        script: |
-          xcode-project use-profiles
+      # - name: Set up code signing settings on Xcode project
+      #   script: |
+      #     xcode-project use-profiles
 
       # 获取Flutter依赖
       - name: Get Flutter packages
@@ -93,16 +93,16 @@ workflows:
             --no-tree-shake-icons --split-per-abi
 
       # ios. 安装 Pods
-      - name: Install pods
-        script: |
-          find . -name "Podfile" -execdir pod install \;
+      # - name: Install pods
+      #   script: |
+      #     find . -name "Podfile" -execdir pod install \;
 
       # ios. 打包构建苹果ipa
-      - name: Build ipa with Flutter
-        script: |
-          flutter build ipa --release \
-            --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}" \
-            --export-options-plist=/Users/builder/export_options.plist
+      # - name: Build ipa with Flutter
+      #   script: |
+      #     flutter build ipa --release \
+      #       --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}" \
+      #       --export-options-plist=/Users/builder/export_options.plist
 
     artifacts:
       - build/app/outputs/flutter-apk/**/*.apk
@@ -138,7 +138,7 @@ workflows:
         # 自定义应用构建号
         BUILD_NUMBER: "1"
         # 自定义应用名称
-        APP_NAME: "CC GAME 1"
+        APP_NAME: "CC GAME 2"
         # 自定义待加载的 web 网址 以及 网址中用来请求的api链接
         WEB_URL: "https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev?baseUrl=https://9212-bankski-game-v1h88uwaamm.ws-us121.gitpod.io"
 
