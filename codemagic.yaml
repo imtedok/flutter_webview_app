@@ -7,8 +7,8 @@ workflows:
     # integrations:
     #   app_store_connect: for_codemagic
     environment:
-      groups:
-        - group-name
+      #groups:
+        #- group-name
       # android签名信息
       android_signing:
         - cc_game_apk_jks
