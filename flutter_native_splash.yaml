@@ -10,12 +10,12 @@ flutter_native_splash:
 #  branding_dark: assets/branding-acceptance.png
 
   android_12:
-    color: "#331D63"
+    color: '#331D63'
     image: assets/splash/appLogo.png
-    icon_background_color: "#331D63"
-    color_dark: "#331D63"
+    icon_background_color: '#331D63'
+    color_dark: '#331D63'
     image_dark: assets/splash/appLogo.png
-    icon_background_color_dark: "#331D63"
+    icon_background_color_dark: '#331D63'
 
   web: false
   fullscreen: true
