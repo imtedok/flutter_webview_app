@@ -75,7 +75,7 @@ workflows:
           # 解码app图标
           if [ -n "$APP_LUNCHER_ICON_BASE64" ]; then
           echo "解码app图标..."
-          echo "$LAUNCHER_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > assets/icons/logo512.png
+          echo "$APP_LUNCHER_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > assets/icons/logo512.png
           echo "✅ app图标更新完成"
           else
           echo "⚠️ 使用默认app图标"
