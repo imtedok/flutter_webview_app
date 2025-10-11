@@ -56,8 +56,6 @@ workflows:
           echo "OSS_ACCESS_KEY_SECRET: $OSS_ACCESS_KEY_SECRET"
           echo "OSS_ACCESS_KEY_SECRET: ${OSS_ACCESS_KEY_SECRET}"
           echo "OSS_BUCKET: $OSS_BUCKET"
-          # 终止程序
-          exit 1
       # android. 配置local.properties
       - name: Set up local.properties
         script: |
