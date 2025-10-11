@@ -136,6 +136,7 @@ workflows:
             --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}" \
             --no-tree-shake-icons --split-per-abi
 
+
       # ios. 安装 Pods
       # - name: Install pods
       #   script: |
@@ -148,6 +149,9 @@ workflows:
       #       --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}" \
       #       --export-options-plist=/Users/builder/export_options.plist
 
+      # 报告构建状态
+      - name: Build finished successfully
+        script: touch ~/SUCCESS
     artifacts:
       - build/app/outputs/flutter-apk/**/*.apk
       - build/**/outputs/**/mapping.txt
