@@ -190,7 +190,8 @@ workflows:
                 cd ../
                 # 开始上传
                 #ossutil cp -r $CM_BUILD_DIR/app/build/outputs/flutter-apk/ oss://${OSS_BUCKET}/${OSS_FILEPATH}/ --include "*.apk" -f -j 3 --access-key-id ${OSS_ACCESS_KEY_ID} --access-key-secret ${OSS_ACCESS_KEY_SECRET} --endpoint ${OSS_ENDPOINT} --region ${OSS_REGION}
-                ${OSSUTIL_CMD} cp -r "${PWD}/build/app/outputs/flutter-apk" oss://${OSS_BUCKET}/${OSS_FILEPATH}/ --include "*.apk" -f -j 3 --access-key-id ${OSS_ACCESS_KEY_ID} --access-key-secret ${OSS_ACCESS_KEY_SECRET} --endpoint ${OSS_ENDPOINT} --region ${OSS_REGION}
+                #${OSSUTIL_CMD} cp -r "${PWD}/build/app/outputs/flutter-apk" oss://${OSS_BUCKET}/${OSS_FILEPATH}/ --include "*.apk" -f -j 3 --access-key-id ${OSS_ACCESS_KEY_ID} --access-key-secret ${OSS_ACCESS_KEY_SECRET} --endpoint ${OSS_ENDPOINT} --region ${OSS_REGION}
+                ${OSSUTIL_CMD} cp -r "${PWD}/build/app/outputs/flutter-apk" oss://${OSS_BUCKET}/${OSS_FILEPATH}/ --include "*.apk" -f -j 3 --endpoint ${OSS_ENDPOINT} --region ${OSS_REGION}
             else
                # build failed
                echo "Build failed, skipping APK upload"
