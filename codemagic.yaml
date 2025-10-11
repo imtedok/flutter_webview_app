@@ -167,13 +167,26 @@ workflows:
                 echo "Start to upload .apk to oss"
             
                 # 安装阿里云ossutil
-                curl -o ossutil-2.1.2-mac-arm64.zip https://gosspublic.alicdn.com/ossutil/v2/2.1.2/ossutil-2.1.2-mac-arm64.zip
+                curl -o ossutil-2.1.2-mac-arm64.zip  https://gosspublic.alicdn.com/ossutil/v2/2.1.2/ossutil-2.1.2-mac-arm64.zip
                 unzip ossutil-2.1.2-mac-arm64.zip
                 cd ossutil-2.1.2-mac-arm64
                 chmod 755 ossutil
-                mv ossutil /usr/local/bin/ && ln -s /usr/local/bin/ossutil /usr/bin/ossutil
+                #mv ossutil /usr/local/bin/ && ln -s /usr/local/bin/ossutil /usr/bin/ossutil
+                # 直接使用当前目录的ossutil，避免移动操作
+                #OSSUTIL_CMD="./ossutil"
                 # 开始上传
-                ossutil cp -r $CM_BUILD_DIR/app/build/outputs/flutter-apk/ oss://${OSS_BUCKET}/${OSS_FILEPATH}/ --include "*.apk" -f -j 3 --access-key-id ${OSS_ACCESS_KEY_ID} --access-key-secret ${OSS_ACCESS_KEY_SECRET} --endpoint ${OSS_ENDPOINT} --region ${OSS_REGION}
+                #ossutil cp -r $CM_BUILD_DIR/app/build/outputs/flutter-apk/ oss://${OSS_BUCKET}/${OSS_FILEPATH}/ --include "*.apk" -f -j 3 --access-key-id ${OSS_ACCESS_KEY_ID} --access-key-secret ${OSS_ACCESS_KEY_SECRET} --endpoint ${OSS_ENDPOINT} --region ${OSS_REGION}
+                apkPath=$(find build -name "*.apk" | head -1)
+                if [[ -z "${apkPath}" ]]; then
+                  echo "No .apk files were found"
+                else
+                  echo "Found first APK: ${apkPath}"
+                  # 获取第一个APK文件所在的目录
+                  apkDir=$(dirname "${apkPath}")
+                  echo "APK directory: ${apkDir}"
+                  echo "Publishing all .apk artifacts from ${apkDir}"
+                  ./ossutil cp -r "${apkDir}" oss://${OSS_BUCKET}/${OSS_FILEPATH}/ --include "*.apk" -f -j 3 --access-key-id ${OSS_ACCESS_KEY_ID} --access-key-secret ${OSS_ACCESS_KEY_SECRET} --endpoint ${OSS_ENDPOINT} --region ${OSS_REGION}
+                fi
                 echo "Publishing .apk oss success"
             else
                # build failed
