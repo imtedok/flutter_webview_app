@@ -161,14 +161,6 @@ workflows:
       scripts:
         - name: Publish to ALIYUN OSS
           script: |
-#            apkPath=$(find build -name "*.apk" | head -1)
-#            if [[ -z ${apkPath} ]]
-#            then
-#            echo "No .apk were found"
-#            else
-#            echo "Publishing .apk artifacts"
-#            fi
-      
             if [  -f ~/SUCCESS ] ; then
                # build successful
                 echo "Start to upload .apk to oss"
