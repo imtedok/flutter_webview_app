@@ -41,7 +41,8 @@ workflows:
         OSS_BUCKET: "bucket-name"
         OSS_ENDPOINT: "oss-cn-hongkong.aliyuncs.com"
         OSS_REGION: "cn-hongkong"
-        OSS_FILEPATH: "/apk/"
+        # 文件保存路径注意不要携带/开头
+        OSS_FILEPATH: "apk/"
 
       flutter: stable
       xcode: latest
