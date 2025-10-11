@@ -48,6 +48,16 @@ workflows:
       xcode: latest
       cocoapods: default
     scripts:
+      # 输出oss配置,并终止打包
+      - name: Print OSS
+        script: |
+          echo "OSS_ACCESS_KEY_ID: $OSS_ACCESS_KEY_ID"
+          echo "OSS_ACCESS_KEY_ID2: ${OSS_ACCESS_KEY_ID}"
+          echo "OSS_ACCESS_KEY_SECRET: $OSS_ACCESS_KEY_SECRET"
+          echo "OSS_ACCESS_KEY_SECRET: ${OSS_ACCESS_KEY_SECRET}"
+          echo "OSS_BUCKET: $OSS_BUCKET"
+          # 终止程序
+          exit 1
       # android. 配置local.properties
       - name: Set up local.properties
         script: |
