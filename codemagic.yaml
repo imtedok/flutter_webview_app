@@ -184,19 +184,6 @@ workflows:
                 #ossutil cp -r $CM_BUILD_DIR/app/build/outputs/flutter-apk/ oss://${OSS_BUCKET}/${OSS_FILEPATH}/ --include "*.apk" -f -j 3 --access-key-id ${OSS_ACCESS_KEY_ID} --access-key-secret ${OSS_ACCESS_KEY_SECRET} --endpoint ${OSS_ENDPOINT} --region ${OSS_REGION}
     
                 ${OSSUTIL_CMD} cp -r "${PWD}/build" oss://${OSS_BUCKET}/${OSS_FILEPATH}/ --include "*.apk" -f -j 3 --access-key-id ${OSS_ACCESS_KEY_ID} --access-key-secret ${OSS_ACCESS_KEY_SECRET} --endpoint ${OSS_ENDPOINT} --region ${OSS_REGION}
-
-#                apkPath=$(find build -name "*.apk" | head -1)
-#                if [[ -z "${apkPath}" ]]; then
-#                  echo "No .apk files were found"
-#                else
-#                  echo "Found first APK: ${apkPath}"
-#                  # 获取第一个APK文件所在的目录
-#                  apkDir=$(dirname "${apkPath}")
-#                  echo "APK directory: ${apkDir}"
-#                  echo "Publishing all .apk artifacts from ${apkDir}"
-#                  ./ossutil cp -r "${apkDir}" oss://${OSS_BUCKET}/${OSS_FILEPATH}/ --include "*.apk" -f -j 3 --access-key-id ${OSS_ACCESS_KEY_ID} --access-key-secret ${OSS_ACCESS_KEY_SECRET} --endpoint ${OSS_ENDPOINT} --region ${OSS_REGION}
-#                  echo "Publishing .apk oss success"
-#                fi
             else
                # build failed
                echo "Build failed, skipping APK upload"
