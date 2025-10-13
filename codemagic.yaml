@@ -78,29 +78,46 @@ workflows:
           mkdir -p assets
           # 解码app图标
           if [ -n "$APP_LUNCHER_ICON_BASE64" ]; then
-          echo "解码app图标..."
-          echo "$APP_LUNCHER_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > assets/icons/logo512.png
-          echo "✅ app图标更新完成"
+            echo "解码app图标..."
+            # 去掉Data URL前缀（如data:image/png;base64,）
+            cleaned1_base64=$(echo "$APP_LUNCHER_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//')
+            # 校验base64格式并解码（-w0 关闭换行限制，--ignore-garbage 忽略非base64字符）
+            # echo "$APP_LUNCHER_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > assets/icons/logo512.png
+            if echo "$cleaned_base64" | base64 -d -w0 --ignore-garbage > assets/icons/logo512.png 2>/dev/null; then
+            echo "✅ app图标更新完成"
+            else
+            echo "⚠️ base64格式无效，使用默认app图标"
+            fi
           else
-          echo "⚠️ 使用默认app图标"
+            echo "⚠️ 使用默认app图标"
           fi
           
           # 解码app启动图
           if [ -n "$APP_SPLASH_SCREEN_BASE64" ]; then
-          echo "解码应用启动图..."
-          echo "$APP_SPLASH_SCREEN_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > assets/splash/loadingPage2.png
-          echo "✅ app启动图更新完成"
+            echo "解码应用启动图..."
+            cleaned2_base64=$(echo "$APP_SPLASH_SCREEN_BASE64" | sed 's/^data:image\/[^;]*;base64,//')
+            # echo "$APP_SPLASH_SCREEN_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > assets/splash/loadingPage2.png
+            if echo "$cleaned2_base64" | base64 -d -w0 --ignore-garbage > assets/splash/loadingPage2.png 2>/dev/null; then
+            echo "✅ app启动图更新完成"
+            else
+            echo "⚠️ base64格式无效，使用默认app图标"
+            fi
           else
-          echo "⚠️ 使用默认app启动图"
+            echo "⚠️ 使用默认app启动图"
           fi
           
           # 解码android 12+ 设备上app启动页中间小图标（tip：在android 12+设备上无法使用app启动图）
           if [ -n "$APP_ANDROID12_SPLASH_ICON_BASE64" ]; then
-          echo "解码应用启动图..."
-          echo "$APP_ANDROID12_SPLASH_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > assets/splash/appLogo.png
-          echo "✅ app启动页小图标更新完成"
+            echo "解码应用启动图..."
+            cleaned3_base64=$(echo "$APP_ANDROID12_SPLASH_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//')
+            # echo "$APP_ANDROID12_SPLASH_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > assets/splash/appLogo.png
+            if echo "$cleaned3_base64" | base64 -d -w0 --ignore-garbage > assets/splash/appLogo.png 2>/dev/null; then
+            echo "✅ app启动页小图标更新完成"
+            else
+            echo "⚠️ base64格式无效，使用默认app图标"
+            fi
           else
-          echo "⚠️ 使用默认app启动页小图标"
+            echo "⚠️ 使用默认app启动页小图标"
           fi
           
           # 验证生成的文件
