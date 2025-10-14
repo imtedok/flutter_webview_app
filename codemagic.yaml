@@ -79,14 +79,15 @@ workflows:
           # 解码app图标
           if [ -n "$APP_LUNCHER_ICON_BASE64" ]; then
             echo "解码app图标..."
-            # 去掉Data URL前缀（如data:image/png;base64,）
-            cleaned1_base64=$(echo "$APP_LUNCHER_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//')
+            # 先解码到临时变量，避免文件被提前清空
+            decoded_image1=$(echo "$APP_LUNCHER_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d -w0 --ignore-garbage 2>/dev/null)
             # 校验base64格式并解码（-w0 关闭换行限制，--ignore-garbage 忽略非base64字符）
             # echo "$APP_LUNCHER_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > assets/icons/logo512.png
-            if echo "$cleaned_base64" | base64 -d -w0 --ignore-garbage > assets/icons/logo512.png 2>/dev/null; then
-            echo "✅ app图标更新完成"
+            if [ -n "$decoded_image1" ]; then
+              echo "$decoded_image1" > assets/icons/logo512.png
+              echo "✅ app图标更新完成"
             else
-            echo "⚠️ base64格式无效，使用默认app图标"
+              echo "⚠️ base64格式无效，使用默认app图标"
             fi
           else
             echo "⚠️ 使用默认app图标"
@@ -95,12 +96,13 @@ workflows:
           # 解码app启动图
           if [ -n "$APP_SPLASH_SCREEN_BASE64" ]; then
             echo "解码应用启动图..."
-            cleaned2_base64=$(echo "$APP_SPLASH_SCREEN_BASE64" | sed 's/^data:image\/[^;]*;base64,//')
+            decoded_image2=$(echo "$APP_SPLASH_SCREEN_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d -w0 --ignore-garbage 2>/dev/null)
             # echo "$APP_SPLASH_SCREEN_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > assets/splash/loadingPage2.png
-            if echo "$cleaned2_base64" | base64 -d -w0 --ignore-garbage > assets/splash/loadingPage2.png 2>/dev/null; then
-            echo "✅ app启动图更新完成"
+            if [ -n "$decoded_image2" ]; then
+              echo "$decoded_image2" > assets/splash/loadingPage2.png
+              echo "✅ app启动图更新完成"
             else
-            echo "⚠️ base64格式无效，使用默认app图标"
+              echo "⚠️ base64格式无效，使用默认app启动图"
             fi
           else
             echo "⚠️ 使用默认app启动图"
@@ -109,12 +111,13 @@ workflows:
           # 解码android 12+ 设备上app启动页中间小图标（tip：在android 12+设备上无法使用app启动图）
           if [ -n "$APP_ANDROID12_SPLASH_ICON_BASE64" ]; then
             echo "解码应用启动图..."
-            cleaned3_base64=$(echo "$APP_ANDROID12_SPLASH_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//')
+            decoded_image3=$(echo "$APP_ANDROID12_SPLASH_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d -w0 --ignore-garbage 2>/dev/null)
             # echo "$APP_ANDROID12_SPLASH_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > assets/splash/appLogo.png
-            if echo "$cleaned3_base64" | base64 -d -w0 --ignore-garbage > assets/splash/appLogo.png 2>/dev/null; then
-            echo "✅ app启动页小图标更新完成"
+            if [ -n "$decoded_image3" ]; then
+              echo "$decoded_image3" > assets/splash/appLogo.png
+              echo "✅ app启动页小图标更新完成"
             else
-            echo "⚠️ base64格式无效，使用默认app图标"
+              echo "⚠️ base64格式无效，使用默认app启动页小图标"
             fi
           else
             echo "⚠️ 使用默认app启动页小图标"
@@ -131,12 +134,12 @@ workflows:
       - name: Update flutter flutter_native_splash.yaml
         script: |
           echo "Update flutter_native_splash.yaml..."
-          sed -e "s#color: '[^']*'#color: '${APP_ANDROID12_SPLASH_BG}'#g" \
-              -e "s#icon_background_color: '[^']*'#icon_background_color: '${APP_ANDROID12_SPLASH_BG}'#g" \
-              -e "s#color_dark: '[^']*'#color_dark: '${APP_ANDROID12_SPLASH_BG}'#g" \
-              -e "s#icon_background_color_dark: '[^']*'#icon_background_color_dark: '${APP_ANDROID12_SPLASH_BG}'#g" \
+          sed -e "s|color: '[^']*'|color: '${APP_ANDROID12_SPLASH_BG}'|g" \
+              -e "s|icon_background_color: '[^']*'|icon_background_color: '${APP_ANDROID12_SPLASH_BG}'|g" \
+              -e "s|color_dark: '[^']*'|color_dark: '${APP_ANDROID12_SPLASH_BG}'|g" \
+              -e "s|icon_background_color_dark: '[^']*'|icon_background_color_dark: '${APP_ANDROID12_SPLASH_BG}'|g" \
               flutter_native_splash.yaml > flutter_native_splash.yaml.tmp && mv flutter_native_splash.yaml.tmp flutter_native_splash.yaml
-          
+
           echo "Verifying updated variables..."
           cat flutter_native_splash.yaml
 
