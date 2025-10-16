@@ -206,7 +206,7 @@ workflows:
         script: |
           flutter build apk \
             --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}" \
-            --no-tree-shake-icons --target-platform android-arm6
+            --no-tree-shake-icons --target-platform android-arm64
 
 
       # ios. 安装 Pods
