@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_plugin_engagelab/flutter_plugin_engagelab.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:game_shell_engine/webUrl.dart';
 
 import 'WebControllerUtil.dart';
@@ -48,7 +50,7 @@ class JPushUtil {
     initBadgeCount(null);
     FlutterPluginEngagelab.printMy(
         "flutter get registration id : $registrationID");
-    /*SmartDialog.show(builder: (context) {
+    SmartDialog.show(builder: (context) {
       return Container(
         height: 80,
         width: 220,
@@ -70,7 +72,7 @@ class JPushUtil {
         "extras": {"foodName": "肯德基大盘鸡", "price": "100"}
       };
       JPushUtil().sendLocalMessage(msg);
-    });*/
+    });
     return registrationID;
   }
 
