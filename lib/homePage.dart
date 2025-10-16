@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
       // 加载悬浮刷新按钮
       _showOverlay();
       /// 初始化极光推送国际版
-      // JPushUtil().initJPush();
+      JPushUtil().initJPush();
     });
     pullToRefreshController = kIsWeb
         ? null
