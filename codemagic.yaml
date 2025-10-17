@@ -33,7 +33,7 @@ workflows:
         APP_LUNCHER_ICON_BASE64: "-"
         # 自定义app启动图，必须为base64的图片格式
         APP_SPLASH_SCREEN_BASE64: "-"
-        # 兼容在android 12+ 设备上设置app启动图不生效，设置启动页小图标（tip: 图片画布大小为1152*1152，图像大小为687*687）
+        # 兼容在android 12+ 设备上设置app启动图不生效，设置启动页小图标（tip: 图片画布大小为1152*1152，图像大小为768*768）
         APP_ANDROID12_SPLASH_ICON_BASE64: "-"
         # 兼容在android 12+ 设备上设置app启动图不生效，设置启动页背景色，接收16进制色值：#FFFFFF
         APP_ANDROID12_SPLASH_BG: "#FFFFFF"

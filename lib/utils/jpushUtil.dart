@@ -50,7 +50,7 @@ class JPushUtil {
     initBadgeCount(null);
     FlutterPluginEngagelab.printMy(
         "flutter get registration id : $registrationID");
-    SmartDialog.show(builder: (context) {
+    /*SmartDialog.show(builder: (context) {
       return Container(
         height: 80,
         width: 220,
@@ -72,7 +72,7 @@ class JPushUtil {
         "extras": {"foodName": "肯德基大盘鸡", "price": "100"}
       };
       JPushUtil().sendLocalMessage(msg);
-    });
+    });*/
     return registrationID;
   }
 
