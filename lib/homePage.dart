@@ -208,15 +208,8 @@ class _HomePageState extends State<HomePage> {
                         }
                       },
                       shouldOverrideUrlLoading: (controller, navigationAction) {
-                        if (kDebugMode) {
-                          print(
-                              'navigationAction = ${navigationAction.toString()}');
-                        }
                         final uri = navigationAction.request.url;
-                        if ((uri?.toString().startsWith('https://www.kkgametop.xyz') ?? false)
-                            || (uri?.toString().startsWith('http://192.168.18.182') ?? false)
-                            || (uri?.toString().startsWith('https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev') ?? false)
-                            || (uri?.toString().startsWith(webUrl) ?? false)) {
+                        if (isUrlInWhiteList(uri?.toString()) || (uri?.toString().startsWith(webUrl) ?? false)) {
                           /// 放行
                           return Future(
                             () => NavigationActionPolicy.ALLOW,
