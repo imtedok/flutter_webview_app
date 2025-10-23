@@ -9,6 +9,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:game_shell_engine/utils/WebControllerUtil.dart';
 import 'package:game_shell_engine/utils/jpushUtil.dart';
+import 'package:game_shell_engine/utils/userAgentUtil.dart';
 import 'package:game_shell_engine/webUrl.dart';
 import 'package:game_shell_engine/windowPopup.dart';
 import 'package:intl/intl.dart';
@@ -160,8 +161,9 @@ class _HomePageState extends State<HomePage> {
                         // 允许不安全请求（如http）
                         allowUniversalAccessFromFileURLs: true,
                         // 允许混合内容 (HTTP/HTTPS)，解决在android手机上网址访问（http跳转链接、http图片链接等）不了的问题
-                        mixedContentMode:
-                            MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
+                        mixedContentMode: MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
+                        // 2. 设置自定义 User-Agent（模拟标准浏览器）
+                        userAgent: getUserAgent()
                       ),
                       pullToRefreshController: pullToRefreshController,
                       onWebViewCreated: (controller) async {
@@ -208,15 +210,8 @@ class _HomePageState extends State<HomePage> {
                         }
                       },
                       shouldOverrideUrlLoading: (controller, navigationAction) {
-                        if (kDebugMode) {
-                          print(
-                              'navigationAction = ${navigationAction.toString()}');
-                        }
                         final uri = navigationAction.request.url;
-                        if ((uri?.toString().startsWith('https://www.kkgametop.xyz') ?? false)
-                            || (uri?.toString().startsWith('http://192.168.18.182') ?? false)
-                            || (uri?.toString().startsWith('https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev') ?? false)
-                            || (uri?.toString().startsWith(webUrl) ?? false)) {
+                        if (isUrlInWhiteList(uri?.toString()) || (uri?.toString().startsWith(webUrl) ?? false)) {
                           /// 放行
                           return Future(
                             () => NavigationActionPolicy.ALLOW,
