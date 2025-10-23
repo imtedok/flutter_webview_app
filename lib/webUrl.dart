@@ -6,7 +6,10 @@ const urlWhiteList = [
   'https://www.kkgametop.xyz',
   'http://192.168.18.182',
   'https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev',
-  'https://accounts.google.com'
+  // google 登录需要
+  'https://accounts.google.com',
+  // google 登录需要
+  'https://accounts.youtube.com'
 ];
 
 /// 判断 URL 是否以白名单中的任一链接开头
