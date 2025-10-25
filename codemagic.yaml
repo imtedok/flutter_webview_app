@@ -8,7 +8,7 @@ workflows:
     #   app_store_connect: for_codemagic
     environment:
       groups:
-      - oss_credentials
+        - oss_credentials
       # android签名信息
       android_signing:
         - cc_game_apk_jks
@@ -20,9 +20,9 @@ workflows:
       vars:
         # 自定义包名，修改后影响较大
         # （ios得事先在苹果开发者平台添加指定包名以及描述文件以及推送证书，并上传codemagic以及推送平台，android只需更新推送平台信息）
-        PACKAGE_NAME: "com.ccgametest2.live"
+        PACKAGE_NAME: "x.x.x"
         # 自定义待加载的极光推送的 JPUSH_APP_KEY【与 PACKAGE_NAME 包名高度绑定，一旦包名变更，此值也须变更，主要受推送平台影响】
-        JPUSH_APP_KEY: "8b68b9303424eadca9e99ae9"
+        JPUSH_APP_KEY: "x"
         # 自定义应用版本号
         APP_VERSION: "1.0.2"
         # 自定义应用构建号
@@ -30,7 +30,7 @@ workflows:
         # 自定义应用名称
         APP_NAME: "CCGAME2"
         # 自定义待加载的 web 网址 以及 网址中用来请求的api链接
-        WEB_URL: "https://new.ccgametest.live"
+        WEB_URL: "https://x.com"
         # 自定义app图标，base64的图片格式或图片url链接，图像大小为512x512
         APP_LUNCHER_ICON_BASE64: "-"
         # 自定义app启动图，base64的图片格式或图片url链接，图像大小为786*1738
@@ -53,13 +53,13 @@ workflows:
       cocoapods: default
     scripts:
       # 输出oss配置 - 开发阶段测试打印用
-#      - name: Print OSS
-#        script: |
-#          echo "OSS_ACCESS_KEY_ID: $OSS_ACCESS_KEY_ID"
-#          echo "OSS_ACCESS_KEY_ID2: ${OSS_ACCESS_KEY_ID}"
-#          echo "OSS_ACCESS_KEY_SECRET: $OSS_ACCESS_KEY_SECRET"
-#          echo "OSS_ACCESS_KEY_SECRET: ${OSS_ACCESS_KEY_SECRET}"
-#          echo "OSS_BUCKET: $OSS_BUCKET"
+      #      - name: Print OSS
+      #        script: |
+      #          echo "OSS_ACCESS_KEY_ID: $OSS_ACCESS_KEY_ID"
+      #          echo "OSS_ACCESS_KEY_ID2: ${OSS_ACCESS_KEY_ID}"
+      #          echo "OSS_ACCESS_KEY_SECRET: $OSS_ACCESS_KEY_SECRET"
+      #          echo "OSS_ACCESS_KEY_SECRET: ${OSS_ACCESS_KEY_SECRET}"
+      #          echo "OSS_BUCKET: $OSS_BUCKET"
       # android. 配置local.properties
       - name: Set up local.properties
         script: |
@@ -194,7 +194,9 @@ workflows:
       - name: Update flutter webUrl.dart
         script: |
           echo "Update webUrl.dart..."
-          sed -e "s#const String webUrl = '[^']*'#const String webUrl = '${WEB_URL}'#g" \
+          # 由于&在sed中是特殊语法，先自动将 & 转义为 \&，避免链接修改出错
+          REAL_WEB_URL=$(echo "$WEB_URL" | sed 's/&/\\&/g')
+          sed -e "s#const String webUrl = '[^']*'#const String webUrl = '${REAL_WEB_URL}'#g" \
               -e "s#const String jpushAppKey = '[^']*'#const String jpushAppKey = '${JPUSH_APP_KEY}'#g" \
               lib/webUrl.dart > lib/webUrl.dart.tmp && mv lib/webUrl.dart.tmp lib/webUrl.dart
           
@@ -260,12 +262,12 @@ workflows:
                # build failed
                echo "Build failed, skipping APK upload"
             fi
-#      email:
-#        recipients:
-#          - xs121913958@163.com
-#        notify:
-#          success: true
-#          failure: false
+  #      email:
+  #        recipients:
+  #          - xs121913958@163.com
+  #        notify:
+  #          success: true
+  #          failure: false
 
   # Flutter构建流水线（ios非签名版本）
   flutter-workflow-nosign:
