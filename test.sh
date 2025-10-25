@@ -2,13 +2,13 @@
 
 echo "Update webUrl.dart..."
 
-# 定义要设置的新值
-NEW_WEB_URL="https://www.baidu.com"
-NEW_JPUSH_KEY="0000011111aaaaabbbbbb"
+WEB_URL="https://new.ccgametest.live?ch=3&type=1"
+JPUSH_APP_KEY="8b68b9303424eadca9e99ae9"
 
-# 更精确的匹配，包括const String前缀
-sed -e "s#const String webUrl = '[^']*'#const String webUrl = '$NEW_WEB_URL'#g" \
-    -e "s#const String jpushAppKey = '[^']*'#const String jpushAppKey = '$NEW_JPUSH_KEY'#g" \
+REAL_WEB_URL=$(echo "$WEB_URL" | sed 's/&/\\&/g')  # 自动将 & 转义为 \&
+
+sed -e "s#const String webUrl = '[^']*'#const String webUrl = '${REAL_WEB_URL}'#g" \
+    -e "s#const String jpushAppKey = '[^']*'#const String jpushAppKey = '${JPUSH_APP_KEY}'#g" \
     lib/webUrl.dart > lib/webUrl.dart.tmp && mv lib/webUrl.dart.tmp lib/webUrl.dart
 
 echo "Verifying updated variables..."

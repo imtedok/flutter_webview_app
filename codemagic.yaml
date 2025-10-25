@@ -159,7 +159,9 @@ workflows:
       - name: Update flutter webUrl.dart
         script: |
           echo "Update webUrl.dart..."
-          sed -e "s#const String webUrl = '[^']*'#const String webUrl = '${WEB_URL}'#g" \
+          # 由于&在sed中是特殊语法，先自动将 & 转义为 \&，避免链接修改出错
+          REAL_WEB_URL=$(echo "$WEB_URL" | sed 's/&/\\&/g')
+          sed -e "s#const String webUrl = '[^']*'#const String webUrl = '${REAL_WEB_URL}'#g" \
               -e "s#const String jpushAppKey = '[^']*'#const String jpushAppKey = '${JPUSH_APP_KEY}'#g" \
               lib/webUrl.dart > lib/webUrl.dart.tmp && mv lib/webUrl.dart.tmp lib/webUrl.dart
   
