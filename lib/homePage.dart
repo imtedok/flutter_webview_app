@@ -210,18 +210,22 @@ class _HomePageState extends State<HomePage> {
                         }
                       },
                       shouldOverrideUrlLoading: (controller, navigationAction) {
-                        final uri = navigationAction.request.url;
-                        if (isUrlInWhiteList(uri?.toString()) || (uri?.toString().startsWith(webUrl) ?? false)) {
-                          /// 放行
+                        // final uri = navigationAction.request.url;
+                        // if (isUrlInWhiteList(uri?.toString()) || (uri?.toString().startsWith(webUrl) ?? false)) {
+                        //   /// 放行
+                        //   return Future(
+                        //     () => NavigationActionPolicy.ALLOW,
+                        //   );
+                        // }
+                        //
+                        // /// 禁止网址打开
+                        // return Future(
+                        //   () => NavigationActionPolicy.CANCEL,
+                        // );
+                          /// 所有访问链接都放行
                           return Future(
                             () => NavigationActionPolicy.ALLOW,
                           );
-                        }
-
-                        /// 禁止网址打开
-                        return Future(
-                          () => NavigationActionPolicy.CANCEL,
-                        );
                       },
                       onCreateWindow: (controller, createWindowAction) async {
                         showDialog(
