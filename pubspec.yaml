@@ -38,6 +38,7 @@ dependencies:
   flutter_smart_dialog: ^4.9.8+8
   intl: ^0.20.2
   draggable_float_widget: ^0.1.0
+  app_links: ^6.4.1
 
 dev_dependencies:
   flutter_test:

@@ -35,6 +35,17 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- 自定义协议：scheme 为协议名（如 myapp），host 可选 -->
+                <data
+                    android:scheme="ccgameapp"
+                    android:host="open.native.app" />  <!-- 链接格式将为 myapp://example?param=xxx -->
+            </intent-filter>
+            <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
