@@ -144,7 +144,7 @@ class _HomePageState extends State<HomePage> {
                     child: InAppWebView(
                       key: webViewKey,
                       initialUrlRequest: URLRequest(
-                        url: WebUri(webUrl),
+                        url: WebUri(getRandomWebUrl()),
                         headers: {
                           /// 由于网址所在的服务器开启了 HTTP Basic Authentication（auth_basic "Authentication";），需要在请求头中绑定认证的账号密码
                           /// 格式为 Authorization: Basic <Base64(username:password)>
