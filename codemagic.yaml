@@ -4,53 +4,71 @@ workflows:
     name: Flutter Workflow
     instance_type: mac_mini_m2
     max_build_duration: 120
-    integrations:
-      app_store_connect: for_codemagic
+    # integrations:
+    #   app_store_connect: for_codemagic
     environment:
+      groups:
+        - oss_credentials
       # android签名信息
       android_signing:
         - cc_game_apk_jks
       # ios签名信息
-      ios_signing:
-        distribution_type: ad_hoc
-        # ios 包名必须指定，请注意跟 PACKAGE_NAME 须保持一致
-        bundle_identifier: com.ccgametest.live
+      # ios_signing:
+      #   distribution_type: ad_hoc
+      #   # ios 包名必须指定，请注意跟 PACKAGE_NAME 须保持一致
+      #   bundle_identifier: com.ccgametest.live
       vars:
         # 自定义包名，修改后影响较大
         # （ios得事先在苹果开发者平台添加指定包名以及描述文件以及推送证书，并上传codemagic以及推送平台，android只需更新推送平台信息）
-        PACKAGE_NAME: "com.ccgametest.live"
+        PACKAGE_NAME: "x.x.x"
         # 自定义待加载的极光推送的 JPUSH_APP_KEY【与 PACKAGE_NAME 包名高度绑定，一旦包名变更，此值也须变更，主要受推送平台影响】
-        JPUSH_APP_KEY: "8b68b9303424eadca9e99ae9"
+        JPUSH_APP_KEY: "x"
         # 自定义应用版本号
-        APP_VERSION: "1.0.1"
+        APP_VERSION: "1.0.2"
         # 自定义应用构建号
         BUILD_NUMBER: "1"
         # 自定义应用名称
-        APP_NAME: "CC GAME 1"
+        APP_NAME: "CCGAME2"
         # 自定义待加载的 web 网址 以及 网址中用来请求的api链接
-        WEB_URL: "https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev?baseUrl=https://9212-bankski-game-v1h88uwaamm.ws-us121.gitpod.io"
-        # 自定义app图标，必须为base64的图片格式
+        WEB_URL: "https://x.com"
+        # 自定义app图标，base64的图片格式或图片url链接，图像大小为512x512
         APP_LUNCHER_ICON_BASE64: "-"
-        # 自定义app启动图，必须为base64的图片格式
+        # 自定义app启动图，base64的图片格式或图片url链接，图像大小为786*1738
         APP_SPLASH_SCREEN_BASE64: "-"
-        # 兼容在android 12+ 设备上设置app启动图不生效，设置启动页小图标（tip: 图片画布大小为1152*1152，图像大小为768*768）
+        # 兼容在android 12+ 设备上设置app启动图不生效，设置启动页小图标（tip: 图片画布大小为1152*1152，图像大小为768*768），base64的图片格式或图片url链接
         APP_ANDROID12_SPLASH_ICON_BASE64: "-"
         # 兼容在android 12+ 设备上设置app启动图不生效，设置启动页背景色，接收16进制色值：#FFFFFF
         APP_ANDROID12_SPLASH_BG: "#FFFFFF"
+        # oss配置
+        #OSS_ACCESS_KEY_ID: ${OSS_ACCESS_KEY_ID} # 改用控制台形式的配置
+        #OSS_ACCESS_KEY_SECRET: ${OSS_ACCESS_KEY_SECRET} # 改用控制台形式(注意配置为私密)的配置
+        OSS_BUCKET: "bucket-name"
+        OSS_ENDPOINT: "oss-cn-hongkong.aliyuncs.com"
+        OSS_REGION: "cn-hongkong"
+        # 文件保存路径开头和结尾注意不要携带/
+        OSS_FILEPATH: "xx/xxx"
 
       flutter: stable
       xcode: latest
       cocoapods: default
     scripts:
+      # 输出oss配置 - 开发阶段测试打印用
+      #      - name: Print OSS
+      #        script: |
+      #          echo "OSS_ACCESS_KEY_ID: $OSS_ACCESS_KEY_ID"
+      #          echo "OSS_ACCESS_KEY_ID2: ${OSS_ACCESS_KEY_ID}"
+      #          echo "OSS_ACCESS_KEY_SECRET: $OSS_ACCESS_KEY_SECRET"
+      #          echo "OSS_ACCESS_KEY_SECRET: ${OSS_ACCESS_KEY_SECRET}"
+      #          echo "OSS_BUCKET: $OSS_BUCKET"
       # android. 配置local.properties
       - name: Set up local.properties
         script: |
           echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
 
       # ios. 设置签名
-      - name: Set up code signing settings on Xcode project
-        script: |
-          xcode-project use-profiles
+      # - name: Set up code signing settings on Xcode project
+      #   script: |
+      #     xcode-project use-profiles
 
       # 获取Flutter依赖
       - name: Get Flutter packages
@@ -73,61 +91,78 @@ workflows:
       # flutter：转换base64格式的app图标以及应用启动图，此步骤必需在 Update app icons、Update splash screen两步之前执行
       - name: Convert Base64 app icons and Base64 splash screen to png
         script: |
+          set -e  # 在命令出错时退出脚本
+          
           echo "=== 开始处理应用图标和启动图 ==="
           # 创建必要的目录
-          mkdir -p assets
-          # 解码app图标
+          mkdir -p assets/icons
+          mkdir -p assets/splash
+          
+          decode_or_download_image() {
+            input=$1
+            output_path=$2
+            if echo "$input" | grep -q '^http'; then
+              # 如果是 URL，则使用 curl 下载
+              echo "下载图像: $input"
+              if ! curl -L -o "$output_path" "$input"; then
+                echo "❌ 图像下载失败，终止脚本"
+                exit 1
+              fi
+              echo "✅ 图像已成功下载到 $output_path"
+            else
+              # 如果是 base64，则解码
+              if ! echo "$input" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > "$output_path" 2>/dev/null; then
+                echo "❌ base64解码失败，终止脚本"
+                exit 1
+              fi
+              echo "✅ 图像已成功解码到 $output_path"
+            fi
+          }
+          
+          # 处理 app 图标
           if [ -n "$APP_LUNCHER_ICON_BASE64" ]; then
-            echo "解码app图标..."
-            # 先解码到临时变量，避免文件被提前清空
-            decoded_image1=$(echo "$APP_LUNCHER_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d -w0 --ignore-garbage 2>/dev/null)
-            # 校验base64格式并解码（-w0 关闭换行限制，--ignore-garbage 忽略非base64字符）
-            # echo "$APP_LUNCHER_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > assets/icons/logo512.png
-            if [ -n "$decoded_image1" ]; then
-              echo "$decoded_image1" > assets/icons/logo512.png
-              echo "✅ app图标更新完成"
-            else
-              echo "⚠️ base64格式无效，使用默认app图标"
-            fi
+            echo "处理 app 图标:"
+            decode_or_download_image "$APP_LUNCHER_ICON_BASE64" "assets/icons/logo512.png"
           else
-            echo "⚠️ 使用默认app图标"
+            echo "❌ 缺少 APP_LUNCHER_ICON_BASE64，终止脚本"
+            exit 1
           fi
           
-          # 解码app启动图
+          # 处理 app 启动图
           if [ -n "$APP_SPLASH_SCREEN_BASE64" ]; then
-            echo "解码应用启动图..."
-            decoded_image2=$(echo "$APP_SPLASH_SCREEN_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d -w0 --ignore-garbage 2>/dev/null)
-            # echo "$APP_SPLASH_SCREEN_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > assets/splash/loadingPage2.png
-            if [ -n "$decoded_image2" ]; then
-              echo "$decoded_image2" > assets/splash/loadingPage2.png
-              echo "✅ app启动图更新完成"
-            else
-              echo "⚠️ base64格式无效，使用默认app启动图"
-            fi
+            echo "处理 app 启动图:"
+            decode_or_download_image "$APP_SPLASH_SCREEN_BASE64" "assets/splash/loadingPage2.png"
           else
-            echo "⚠️ 使用默认app启动图"
+            echo "❌ 缺少 APP_SPLASH_SCREEN_BASE64，终止脚本"
+            exit 1
           fi
           
-          # 解码android 12+ 设备上app启动页中间小图标（tip：在android 12+设备上无法使用app启动图）
+          # 处理 Android 12+ 设备上的 app 启动页中间小图标
           if [ -n "$APP_ANDROID12_SPLASH_ICON_BASE64" ]; then
-            echo "解码应用启动图..."
-            decoded_image3=$(echo "$APP_ANDROID12_SPLASH_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d -w0 --ignore-garbage 2>/dev/null)
-            # echo "$APP_ANDROID12_SPLASH_ICON_BASE64" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > assets/splash/appLogo.png
-            if [ -n "$decoded_image3" ]; then
-              echo "$decoded_image3" > assets/splash/appLogo.png
-              echo "✅ app启动页小图标更新完成"
-            else
-              echo "⚠️ base64格式无效，使用默认app启动页小图标"
-            fi
+            echo "处理 Android 12+ 设备上的 app 启动页中间小图标:"
+            decode_or_download_image "$APP_ANDROID12_SPLASH_ICON_BASE64" "assets/splash/appLogo.png"
           else
-            echo "⚠️ 使用默认app启动页小图标"
+            echo "❌ 缺少 APP_ANDROID12_SPLASH_ICON_BASE64，终止脚本"
+            exit 1
           fi
           
           # 验证生成的文件
-          echo "生成的文件:"
-          ls -la assets/icons/logo512.png 2>/dev/null || echo "assets/icons/logo512.png 不存在"
-          ls -la assets/splash/loadingPage2.png 2>/dev/null || echo "assets/splash/loadingPage2.png 不存在"
-          ls -la assets/splash/appLogo.png 2>/dev/null || echo "assets/splash/appLogo.png 不存在"
+          echo "验证生成的文件:"
+          if [ ! -f assets/icons/logo512.png ]; then
+            echo "❌ assets/icons/logo512.png 不存在"
+            exit 1
+          fi
+          
+          if [ ! -f assets/splash/loadingPage2.png ]; then
+            echo "❌ assets/splash/loadingPage2.png 不存在"
+            exit 1
+          fi
+          
+          if [ ! -f assets/splash/appLogo.png ]; then
+            echo "❌ assets/splash/appLogo.png 不存在"
+            exit 1
+          fi
+          
           echo "=== 图标和启动图处理完成 ==="
 
       # flutter：替换项目 flutter_native_splash.yaml 文件中的内容（兼容处理在android 12+ 设备上启动图无法生效）
@@ -164,7 +199,7 @@ workflows:
           sed -e "s#const String webUrl = '[^']*'#const String webUrl = '${REAL_WEB_URL}'#g" \
               -e "s#const String jpushAppKey = '[^']*'#const String jpushAppKey = '${JPUSH_APP_KEY}'#g" \
               lib/webUrl.dart > lib/webUrl.dart.tmp && mv lib/webUrl.dart.tmp lib/webUrl.dart
-  
+          
           echo "Verifying updated variables..."
           cat lib/webUrl.dart
 
@@ -173,20 +208,24 @@ workflows:
         script: |
           flutter build apk \
             --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}" \
-            --no-tree-shake-icons --split-per-abi
+            --no-tree-shake-icons --target-platform android-arm64
+
 
       # ios. 安装 Pods
-      - name: Install pods
-        script: |
-          find . -name "Podfile" -execdir pod install \;
+      # - name: Install pods
+      #   script: |
+      #     find . -name "Podfile" -execdir pod install \;
 
       # ios. 打包构建苹果ipa
-      - name: Build ipa with Flutter
-        script: |
-          flutter build ipa --release \
-            --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}" \
-            --export-options-plist=/Users/builder/export_options.plist
+      # - name: Build ipa with Flutter
+      #   script: |
+      #     flutter build ipa --release \
+      #       --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}" \
+      #       --export-options-plist=/Users/builder/export_options.plist
 
+      # 报告构建状态
+      - name: Build finished successfully
+        script: touch ~/SUCCESS
     artifacts:
       - build/app/outputs/flutter-apk/**/*.apk
       - build/**/outputs/**/mapping.txt
@@ -194,12 +233,41 @@ workflows:
       - /tmp/xcodebuild_logs/*.log
       - flutter_drive.log
     publishing:
-      email:
-        recipients:
-          - xs121913958@163.com
-        notify:
-          success: true
-          failure: false
+      scripts:
+        - name: Publish to ALIYUN OSS
+          script: |
+            if [  -f ~/SUCCESS ] ; then
+               # build successful
+                echo "Start to upload .apk to oss"
+                PWD="$(pwd)"
+                echo "PWD: ${PWD}"
+            
+                # 安装阿里云ossutil
+                curl -o ossutil-2.1.2-mac-arm64.zip  https://gosspublic.alicdn.com/ossutil/v2/2.1.2/ossutil-2.1.2-mac-arm64.zip
+                unzip ossutil-2.1.2-mac-arm64.zip
+                cd ossutil-2.1.2-mac-arm64
+                chmod 755 ossutil
+                #mv ossutil /usr/local/bin/ && ln -s /usr/local/bin/ossutil /usr/bin/ossutil
+                # 直接使用当前目录的ossutil，避免移动操作
+                #OSSUTIL_CMD="./ossutil"
+                # 获取ossutil绝对路径
+                OSSUTIL_CMD=$(pwd)/ossutil
+                echo "OSSUTIL_CMD: ${OSSUTIL_CMD}"
+                cd ../
+                # 开始上传
+                #ossutil cp -r $CM_BUILD_DIR/app/build/outputs/flutter-apk/ oss://${OSS_BUCKET}/${OSS_FILEPATH}/ --include "*.apk" -f -j 3 --access-key-id ${OSS_ACCESS_KEY_ID} --access-key-secret ${OSS_ACCESS_KEY_SECRET} --endpoint ${OSS_ENDPOINT} --region ${OSS_REGION}
+                #${OSSUTIL_CMD} cp -r "${PWD}/build/app/outputs/flutter-apk" oss://${OSS_BUCKET}/${OSS_FILEPATH}/ --include "*.apk" -f -j 3 --access-key-id ${OSS_ACCESS_KEY_ID} --access-key-secret ${OSS_ACCESS_KEY_SECRET} --endpoint ${OSS_ENDPOINT} --region ${OSS_REGION}
+                ${OSSUTIL_CMD} cp -r "${PWD}/build/app/outputs/flutter-apk" oss://${OSS_BUCKET}/${OSS_FILEPATH}/ --include "*.apk" -f -j 3 --endpoint ${OSS_ENDPOINT} --region ${OSS_REGION}
+            else
+               # build failed
+               echo "Build failed, skipping APK upload"
+            fi
+  #      email:
+  #        recipients:
+  #          - xs121913958@163.com
+  #        notify:
+  #          success: true
+  #          failure: false
 
   # Flutter构建流水线（ios非签名版本）
   flutter-workflow-nosign:
@@ -221,7 +289,7 @@ workflows:
         # 自定义应用构建号
         BUILD_NUMBER: "1"
         # 自定义应用名称
-        APP_NAME: "CC GAME 1"
+        APP_NAME: "CC GAME 2"
         # 自定义待加载的 web 网址 以及 网址中用来请求的api链接
         WEB_URL: "https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev?baseUrl=https://9212-bankski-game-v1h88uwaamm.ws-us121.gitpod.io"
 
