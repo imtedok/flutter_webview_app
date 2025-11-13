@@ -170,6 +170,11 @@ class _HomePageState extends State<HomePage> {
                         WebControllerUtil().initWebFields(controller, true);
                         WebControllerUtil().addJavaScriptHandler();
                       },
+                      onLoadStart: (controller, url) {
+                        if (kDebugMode) {
+                          print('tox onLoadStart url = ${url?.toString()}');
+                        }
+                      },
                       onLoadStop: (controller, url) async {
                         /// 链接加载完时回调
                         /// 同时关掉闪屏页

@@ -1,7 +1,9 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 
-const String webUrl = 'https://new.ccgametest.live';
+const String webUrl = 'https://blockurl.lol';
 const String jpushAppKey = '8b68b9303424eadca9e99ae9';
+var prefixParams = '';
 
 /// 当 webUrl 是由多个域名以逗号,隔开时 随机取一个域名地址加载
 String getRandomWebUrl() {
@@ -11,11 +13,19 @@ String getRandomWebUrl() {
     List<String> urlList = webUrl.split(',');
     // 随机取一个元素（确保数组不为空）
     if (urlList.isNotEmpty) {
-      return urlList[Random().nextInt(urlList.length)];
+      var url = urlList[Random().nextInt(urlList.length)];
+      if (kDebugMode) {
+        print('tox getRandomWebUrl url = ${url.toString()}, prefixParams = $prefixParams');
+      }
+      return url.contains('?') ? '$url&$prefixParams' : '$url?$prefixParams';
     }
   }
+
+  if (kDebugMode) {
+    print('tox getRandomWebUrl webUrl = ${webUrl.toString()}, prefixParams = $prefixParams');
+  }
   // 如果没有逗号或分割后为空，直接返回原字符串
-  return webUrl;
+  return webUrl.contains('?') ? '$webUrl&$prefixParams' : '$webUrl?$prefixParams';
 }
 
 /// 默认允许打开的链接
