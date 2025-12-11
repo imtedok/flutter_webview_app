@@ -241,7 +241,7 @@ workflows:
                 echo "LOCAL_PATH: ${LOCAL_PATH}"
                 
                 # 检查apk文件是否存在
-                if [ ! -f ${LOCAL_PATH} ] ; then
+                if [ ! -f "${LOCAL_PATH}" ] ; then
                   echo "❌ ${LOCAL_PATH} 不存在"
                   exit 1
                 else 
@@ -249,9 +249,9 @@ workflows:
                 fi
                 
                 # 打印wrangler命令的文本
-                echo "do run: wrangler r2 object put ${R2_OBJECT_PATH} --file=${LOCAL_PATH}"
+                echo "🚀 do run: wrangler r2 object put \"${R2_OBJECT_PATH}\" --file=\"${LOCAL_PATH}\""
             
-                wrangler r2 object put ${R2_OBJECT_PATH} --file=${LOCAL_PATH}
+                wrangler r2 object put "${R2_OBJECT_PATH}" --file="${LOCAL_PATH}"
             
                 echo "End to upload .apk to R2"
             else
