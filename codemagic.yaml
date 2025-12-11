@@ -8,7 +8,7 @@ workflows:
     #   app_store_connect: for_codemagic
     environment:
       groups:
-        - oss_credentials
+        - cloudflare_credentials # <-- (Includes CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID)
       # android签名信息
       android_signing:
         - cc_game_apk_jks
@@ -39,14 +39,12 @@ workflows:
         APP_ANDROID12_SPLASH_ICON_BASE64: "-"
         # 兼容在android 12+ 设备上设置app启动图不生效，设置启动页背景色，接收16进制色值：#FFFFFF
         APP_ANDROID12_SPLASH_BG: "#FFFFFF"
-        # oss配置
-        #OSS_ACCESS_KEY_ID: ${OSS_ACCESS_KEY_ID} # 改用控制台形式的配置
-        #OSS_ACCESS_KEY_SECRET: ${OSS_ACCESS_KEY_SECRET} # 改用控制台形式(注意配置为私密)的配置
-        OSS_BUCKET: "bucket-name"
-        OSS_ENDPOINT: "oss-cn-hongkong.aliyuncs.com"
-        OSS_REGION: "cn-hongkong"
+        # R2配置
+        #CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID} # 改用控制台形式的配置
+        #CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN} # 改用控制台形式(注意配置为私密)的配置
+        R2_BUCKET: "newbftest"
         # 文件保存路径开头和结尾注意不要携带/
-        OSS_FILEPATH: "xx/xxx"
+        BUCKET_FILEPATH: "xx/xxx"
 
       flutter: stable
       xcode: latest
@@ -234,30 +232,18 @@ workflows:
       - flutter_drive.log
     publishing:
       scripts:
-        - name: Publish to ALIYUN OSS
+        - name: Install wrangler
+          script: npm install -g wrangler
+        - name: Publish to Cloudflare R2
           script: |
             if [  -f ~/SUCCESS ] ; then
                # build successful
-                echo "Start to upload .apk to oss"
+                echo "Start to upload .apk to R2"
                 PWD="$(pwd)"
                 echo "PWD: ${PWD}"
+                wrangler r2 object put ${R2_BUCKET}/${BUCKET_FILEPATH}/app-release.apk --file=${PWD}/build/app/outputs/flutter-apk/app-release.apk
             
-                # 安装阿里云ossutil
-                curl -o ossutil-2.1.2-mac-arm64.zip  https://gosspublic.alicdn.com/ossutil/v2/2.1.2/ossutil-2.1.2-mac-arm64.zip
-                unzip ossutil-2.1.2-mac-arm64.zip
-                cd ossutil-2.1.2-mac-arm64
-                chmod 755 ossutil
-                #mv ossutil /usr/local/bin/ && ln -s /usr/local/bin/ossutil /usr/bin/ossutil
-                # 直接使用当前目录的ossutil，避免移动操作
-                #OSSUTIL_CMD="./ossutil"
-                # 获取ossutil绝对路径
-                OSSUTIL_CMD=$(pwd)/ossutil
-                echo "OSSUTIL_CMD: ${OSSUTIL_CMD}"
-                cd ../
-                # 开始上传
-                #ossutil cp -r $CM_BUILD_DIR/app/build/outputs/flutter-apk/ oss://${OSS_BUCKET}/${OSS_FILEPATH}/ --include "*.apk" -f -j 3 --access-key-id ${OSS_ACCESS_KEY_ID} --access-key-secret ${OSS_ACCESS_KEY_SECRET} --endpoint ${OSS_ENDPOINT} --region ${OSS_REGION}
-                #${OSSUTIL_CMD} cp -r "${PWD}/build/app/outputs/flutter-apk" oss://${OSS_BUCKET}/${OSS_FILEPATH}/ --include "*.apk" -f -j 3 --access-key-id ${OSS_ACCESS_KEY_ID} --access-key-secret ${OSS_ACCESS_KEY_SECRET} --endpoint ${OSS_ENDPOINT} --region ${OSS_REGION}
-                ${OSSUTIL_CMD} cp -r "${PWD}/build/app/outputs/flutter-apk" oss://${OSS_BUCKET}/${OSS_FILEPATH}/ --include "*.apk" -f -j 3 --endpoint ${OSS_ENDPOINT} --region ${OSS_REGION}
+                echo "End to upload .apk to R2"
             else
                # build failed
                echo "Build failed, skipping APK upload"
@@ -374,10 +360,3 @@ workflows:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
       - flutter_drive.log
-    publishing:
-      email:
-        recipients:
-          - xs121913958@163.com
-        notify:
-          success: true
-          failure: false
