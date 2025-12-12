@@ -249,9 +249,9 @@ workflows:
                 fi
                 
                 # 打印wrangler命令的文本
-                echo "🚀 do run: wrangler r2 object put \"${R2_OBJECT_PATH}\" --file=\"${LOCAL_PATH}\""
+                echo "🚀 do run: wrangler r2 object put \"${R2_OBJECT_PATH}\" --file=\"${LOCAL_PATH}\" --remote"
             
-                wrangler r2 object put "${R2_OBJECT_PATH}" --file="${LOCAL_PATH}"
+                wrangler r2 object put "${R2_OBJECT_PATH}" --file="${LOCAL_PATH}" --remote
             
                 echo "End to upload .apk to R2"
             else
