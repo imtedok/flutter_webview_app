@@ -42,7 +42,7 @@ workflows:
         # R2配置
         #CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID} # 改用控制台形式的配置
         #CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN} # 改用控制台形式(注意配置为私密)的配置
-        R2_BUCKET: "newbftest"
+        R2_BUCKET: "xx"
         # 文件保存路径开头和结尾注意不要携带/
         BUCKET_FILEPATH: "xx/xxx"
 
@@ -260,7 +260,7 @@ workflows:
             fi
   #      email:
   #        recipients:
-  #          - xs121913958@163.com
+  #          - xx@x.com
   #        notify:
   #          success: true
   #          failure: false
