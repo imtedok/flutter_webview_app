@@ -249,7 +249,7 @@ workflows:
                 fi
                 
                 # 打印wrangler命令的文本
-                echo "🚀 do run: wrangler r2 object put \"${R2_OBJECT_PATH}\" --file=\"${LOCAL_PATH}\" --remote"
+                echo "🚀 do run: wrangler r2 object put \"${R2_OBJECT_PATH}\" --file=\"${LOCAL_PATH}\" --remote --content-type "application/vnd.android.package-archive"
             
                 wrangler r2 object put "${R2_OBJECT_PATH}" --file="${LOCAL_PATH}" --remote
             
