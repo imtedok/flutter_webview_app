@@ -1,372 +1,493 @@
 workflows:
-  # Flutter构建流水线
-  flutter-workflow:
-    name: Flutter Workflow
-    instance_type: mac_mini_m2
-    max_build_duration: 120
-    # integrations:
-    #   app_store_connect: for_codemagic
-    environment:
-      groups:
-        - cloudflare_credentials # <-- (Includes CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID)
-      # android签名信息
-      android_signing:
-        - cc_game_apk_jks
-      # ios签名信息
-      # ios_signing:
-      #   distribution_type: ad_hoc
-      #   # ios 包名必须指定，请注意跟 PACKAGE_NAME 须保持一致
-      #   bundle_identifier: com.ccgametest.live
-      vars:
-        # 自定义包名，修改后影响较大
-        # （ios得事先在苹果开发者平台添加指定包名以及描述文件以及推送证书，并上传codemagic以及推送平台，android只需更新推送平台信息）
-        PACKAGE_NAME: "x.x.x"
-        # 自定义待加载的极光推送的 JPUSH_APP_KEY【与 PACKAGE_NAME 包名高度绑定，一旦包名变更，此值也须变更，主要受推送平台影响】
-        JPUSH_APP_KEY: "x"
-        # 自定义应用版本号
-        APP_VERSION: "1.0.2"
-        # 自定义应用构建号
-        BUILD_NUMBER: "1"
-        # 自定义应用名称
-        APP_NAME: "CCGAME2"
-        # 自定义待加载的 web 网址 以及 网址中用来请求的api链接
-        WEB_URL: "https://x.com"
-        # 自定义app图标，base64的图片格式或图片url链接，图像大小为512x512
-        APP_LUNCHER_ICON_BASE64: "-"
-        # 自定义app启动图，base64的图片格式或图片url链接，图像大小为786*1738
-        APP_SPLASH_SCREEN_BASE64: "-"
-        # 兼容在android 12+ 设备上设置app启动图不生效，设置启动页小图标（tip: 图片画布大小为1152*1152，图像大小为768*768），base64的图片格式或图片url链接
-        APP_ANDROID12_SPLASH_ICON_BASE64: "-"
-        # 兼容在android 12+ 设备上设置app启动图不生效，设置启动页背景色，接收16进制色值：#FFFFFF
-        APP_ANDROID12_SPLASH_BG: "#FFFFFF"
-        # R2配置
-        #CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID} # 改用控制台形式的配置
-        #CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN} # 改用控制台形式(注意配置为私密)的配置
-        R2_BUCKET: "xx"
-        # 文件保存路径开头和结尾注意不要携带/
-        BUCKET_FILEPATH: "xx/xxx"
+    # Flutter构建流水线
+    flutter-workflow:
+        name: Flutter Workflow
+        instance_type: mac_mini_m2
+        max_build_duration: 120
+        # integrations:
+        #   app_store_connect: for_codemagic
+        environment:
+            groups:
+                - cloudflare_credentials # <-- (Includes CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID)
+            # android签名信息
+            android_signing:
+                - cc_game_apk_jks
+            # ios签名信息
+            # ios_signing:
+            #   distribution_type: ad_hoc
+            #   # ios 包名必须指定，请注意跟 PACKAGE_NAME 须保持一致
+            #   bundle_identifier: com.ccgametest.live
+            vars:
+                # 自定义包名，修改后影响较大
+                # （ios得事先在苹果开发者平台添加指定包名以及描述文件以及推送证书，并上传codemagic以及推送平台，android只需更新推送平台信息）
+                PACKAGE_NAME: "pub.techfun.platform.p001"
+                # 自定义待加载的极光推送的 JPUSH_APP_KEY【与 PACKAGE_NAME 包名高度绑定，一旦包名变更，此值也须变更，主要受推送平台影响】
+                JPUSH_APP_KEY: "1234567890123456789"
+                # 用于android推送的google-service.json文件，支持两种格式：
+                # 1. 直接填写JSON字符串: 类似GCM='{"project_info":{"project_id":"my-project"}}'
+                # 2. 填写JSON文件的下载链接: 类似GCM='https://example.com/google-services.json'
+                GCM: "https://raw.githubusercontent.com/si-xiao/flutter_webview_app/refs/heads/master/android/app/google-services.json"
+                # 自定义应用版本号
+                APP_VERSION: "1.0.0"
+                # 自定义应用构建号
+                BUILD_NUMBER: "1"
+                # 自定义应用名称
+                APP_NAME: "CCGAME10"
+                # 自定义待加载的 web 网址 以及 网址中用来请求的api链接
+                WEB_URL: "https://x.com"
+                # 自定义app图标，base64的图片格式或图片url链接，图像大小为512x512
+                APP_LUNCHER_ICON_BASE64: "https://statictest.image-oss.online/fec/tenant/uploads/212/2026-01-02/PWAiCon.png"
+                # 自定义app启动图，base64的图片格式或图片url链接，图像大小为786*1738
+                APP_SPLASH_SCREEN_BASE64: "https://statictest.image-oss.online/fec/tenant/uploads/212/2026-01-08/loadingPage2.png"
+                # 兼容在android 12+ 设备上设置app启动图不生效，设置启动页小图标（tip: 图片画布大小为1152*1152，图像大小为768*768），base64的图片格式或图片url链接
+                # APP_ANDROID12_SPLASH_ICON_BASE64: "-"
+                # 兼容在android 12+ 设备上设置app启动图不生效，设置启动页背景色，接收16进制色值：#FFFFFF
+                # APP_ANDROID12_SPLASH_BG: "#FFFFFF"
+                # R2配置
+                #CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID} # 改用控制台形式的配置
+                #CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN} # 改用控制台形式(注意配置为私密)的配置
+                R2_BUCKET: "newbftest"
+                # 文件保存路径开头和结尾注意不要携带/
+                BUCKET_FILEPATH: "xx/xxx"
 
-      flutter: stable
-      xcode: latest
-      cocoapods: default
-    scripts:
-      # android. 配置local.properties
-      - name: Set up local.properties
-        script: |
-          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+            flutter: stable
+            #      flutter: "3.32.4"
+            xcode: latest
+            cocoapods: default
+        scripts:
+            # android. 配置local.properties
+            - name: Set up local.properties
+              script: |
+                  echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
 
-      # ios. 设置签名
-      # - name: Set up code signing settings on Xcode project
-      #   script: |
-      #     xcode-project use-profiles
+            # ios. 设置签名
+            # - name: Set up code signing settings on Xcode project
+            #   script: |
+            #     xcode-project use-profiles
 
-      # 获取Flutter依赖
-      - name: Get Flutter packages
-        script: |
-          flutter pub get
+            # 获取Flutter依赖
+            - name: Get Flutter packages
+              script: |
+                  flutter pub get
 
-      # flutter：修改应用包名（android、ios），此步骤修改之后会影响推送且ios会无法出包，
-      # 请定位至 bundle_identifier，PACKAGE_NAME、JPUSH_APP_KEY等变量处对照处理后再执行打包脚本
-      - name: Update android ios package name
-        script: |
-          echo "Update android ios package name..."
-          dart run change_app_package_name:main "${PACKAGE_NAME}"
+            # flutter：修改应用包名（android、ios），此步骤修改之后会影响推送且ios会无法出包，
+            # 请定位至 bundle_identifier，PACKAGE_NAME、JPUSH_APP_KEY等变量处对照处理后再执行打包脚本
+            - name: Update android ios package name
+              script: |
+                  echo "Update android ios package name..."
+                  dart run change_app_package_name:main "${PACKAGE_NAME}"
 
-      # flutter：更新应用名称
-      - name: Update app name
-        script: |
-          echo "Updating app name..."
-          dart run rename_app:main all="${APP_NAME}"
+            # flutter：更新应用名称
+            - name: Update app name
+              script: |
+                  echo "Updating app name..."
+                  dart run rename_app:main all="${APP_NAME}"
 
-      # flutter：转换base64格式的app图标以及应用启动图，此步骤必需在 Update app icons、Update splash screen两步之前执行
-      - name: Convert Base64 app icons and Base64 splash screen to png
-        script: |
-          set -e  # 在命令出错时退出脚本
-          
-          echo "=== 开始处理应用图标和启动图 ==="
-          # 创建必要的目录
-          mkdir -p assets/icons
-          mkdir -p assets/splash
-          
-          decode_or_download_image() {
-            input=$1
-            output_path=$2
-            if echo "$input" | grep -q '^http'; then
-              # 如果是 URL，则使用 curl 下载
-              echo "下载图像: $input"
-              if ! curl -L -o "$output_path" "$input"; then
-                echo "❌ 图像下载失败，终止脚本"
-                exit 1
-              fi
-              echo "✅ 图像已成功下载到 $output_path"
-            else
-              # 如果是 base64，则解码
-              if ! echo "$input" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > "$output_path" 2>/dev/null; then
-                echo "❌ base64解码失败，终止脚本"
-                exit 1
-              fi
-              echo "✅ 图像已成功解码到 $output_path"
-            fi
-          }
-          
-          # 处理 app 图标
-          if [ -n "$APP_LUNCHER_ICON_BASE64" ]; then
-            echo "处理 app 图标:"
-            decode_or_download_image "$APP_LUNCHER_ICON_BASE64" "assets/icons/logo512.png"
-          else
-            echo "❌ 缺少 APP_LUNCHER_ICON_BASE64，终止脚本"
-            exit 1
-          fi
-          
-          # 处理 app 启动图
-          if [ -n "$APP_SPLASH_SCREEN_BASE64" ]; then
-            echo "处理 app 启动图:"
-            decode_or_download_image "$APP_SPLASH_SCREEN_BASE64" "assets/splash/loadingPage2.png"
-          else
-            echo "❌ 缺少 APP_SPLASH_SCREEN_BASE64，终止脚本"
-            exit 1
-          fi
-          
-          # 处理 Android 12+ 设备上的 app 启动页中间小图标
-          if [ -n "$APP_ANDROID12_SPLASH_ICON_BASE64" ]; then
-            echo "处理 Android 12+ 设备上的 app 启动页中间小图标:"
-            decode_or_download_image "$APP_ANDROID12_SPLASH_ICON_BASE64" "assets/splash/appLogo.png"
-          else
-            echo "❌ 缺少 APP_ANDROID12_SPLASH_ICON_BASE64，终止脚本"
-            exit 1
-          fi
-          
-          # 验证生成的文件
-          echo "验证生成的文件:"
-          if [ ! -f assets/icons/logo512.png ]; then
-            echo "❌ assets/icons/logo512.png 不存在"
-            exit 1
-          fi
-          
-          if [ ! -f assets/splash/loadingPage2.png ]; then
-            echo "❌ assets/splash/loadingPage2.png 不存在"
-            exit 1
-          fi
-          
-          if [ ! -f assets/splash/appLogo.png ]; then
-            echo "❌ assets/splash/appLogo.png 不存在"
-            exit 1
-          fi
-          
-          echo "=== 图标和启动图处理完成 ==="
+            # flutter：转换base64格式的app图标以及应用启动图，此步骤必需在 Update app icons、Update splash screen两步之前执行
+            - name: Convert Base64 app icons and Base64 splash screen to png
+              script: |
+                  set -e  # 在命令出错时退出脚本
+                  
+                  echo "=== 开始处理应用图标和启动图 ==="
+                  # 创建必要的目录
+                  mkdir -p assets/icons
+                  mkdir -p assets/splash
+                  
+                  decode_or_download_image() {
+                    input=$1
+                    output_path=$2
+                    if echo "$input" | grep -q '^http'; then
+                      # 如果是 URL，则使用 curl 下载
+                      echo "下载图像: $input"
+                      if ! curl -L -o "$output_path" "$input"; then
+                        echo "❌ 图像下载失败，终止脚本"
+                        exit 1
+                      fi
+                      echo "✅ 图像已成功下载到 $output_path"
+                    else
+                      # 如果是 base64，则解码
+                      if ! echo "$input" | sed 's/^data:image\/[^;]*;base64,//' | base64 -d > "$output_path" 2>/dev/null; then
+                        echo "❌ base64解码失败，终止脚本"
+                        exit 1
+                      fi
+                      echo "✅ 图像已成功解码到 $output_path"
+                    fi
+                  }
+                  
+                  # 处理 app 图标
+                  if [ -n "$APP_LUNCHER_ICON_BASE64" ]; then
+                    echo "处理 app 图标:"
+                    decode_or_download_image "$APP_LUNCHER_ICON_BASE64" "assets/icons/logo512.png"
+                  else
+                    echo "❌ 缺少 APP_LUNCHER_ICON_BASE64，终止脚本"
+                    exit 1
+                  fi
+                  
+                  # 处理 app 启动图
+                  if [ -n "$APP_SPLASH_SCREEN_BASE64" ]; then
+                    echo "处理 app 启动图:"
+                    decode_or_download_image "$APP_SPLASH_SCREEN_BASE64" "assets/splash/loadingPage2.png"
+                  else
+                    echo "❌ 缺少 APP_SPLASH_SCREEN_BASE64，终止脚本"
+                    exit 1
+                  fi
+                  
+                  # 验证生成的文件
+                  echo "验证生成的文件:"
+                  if [ ! -f assets/icons/logo512.png ]; then
+                    echo "❌ assets/icons/logo512.png 不存在"
+                    exit 1
+                  fi
+                  
+                  if [ ! -f assets/splash/loadingPage2.png ]; then
+                    echo "❌ assets/splash/loadingPage2.png 不存在"
+                    exit 1
+                  fi
+                  
+                  echo "=== 图标和启动图处理完成 ==="
 
-      # flutter：替换项目 flutter_native_splash.yaml 文件中的内容（兼容处理在android 12+ 设备上启动图无法生效）
-      - name: Update flutter flutter_native_splash.yaml
-        script: |
-          echo "Update flutter_native_splash.yaml..."
-          sed -e "s|color: '[^']*'|color: '${APP_ANDROID12_SPLASH_BG}'|g" \
-              -e "s|icon_background_color: '[^']*'|icon_background_color: '${APP_ANDROID12_SPLASH_BG}'|g" \
-              -e "s|color_dark: '[^']*'|color_dark: '${APP_ANDROID12_SPLASH_BG}'|g" \
-              -e "s|icon_background_color_dark: '[^']*'|icon_background_color_dark: '${APP_ANDROID12_SPLASH_BG}'|g" \
-              flutter_native_splash.yaml > flutter_native_splash.yaml.tmp && mv flutter_native_splash.yaml.tmp flutter_native_splash.yaml
+            # flutter：替换项目 flutter_native_splash.yaml 文件中的内容（兼容处理在android 12+ 设备上启动图无法生效）
+            #      - name: Update flutter flutter_native_splash.yaml
+            #        script: |
+            #          echo "Update flutter_native_splash.yaml..."
+            #          sed -e "s|color: '[^']*'|color: '${APP_ANDROID12_SPLASH_BG}'|g" \
+            #              -e "s|icon_background_color: '[^']*'|icon_background_color: '${APP_ANDROID12_SPLASH_BG}'|g" \
+            #              -e "s|color_dark: '[^']*'|color_dark: '${APP_ANDROID12_SPLASH_BG}'|g" \
+            #              -e "s|icon_background_color_dark: '[^']*'|icon_background_color_dark: '${APP_ANDROID12_SPLASH_BG}'|g" \
+            #              flutter_native_splash.yaml > flutter_native_splash.yaml.tmp && mv flutter_native_splash.yaml.tmp flutter_native_splash.yaml
+            #
+            #          echo "Verifying updated variables..."
+            #          cat flutter_native_splash.yaml
 
-          echo "Verifying updated variables..."
-          cat flutter_native_splash.yaml
+            # flutter：更新用户图标，此步骤需先在flutter项目中更新图标资源文件后才能应用新图标或执行 Convert Base64 app icons and Base64 splash screen to png 把Base64的图片格式转换成png并存储在指定资源目录下才能应用到新图标
+            - name: Update app icons
+              script: |
+                  echo "Update icons..."
+                  dart run flutter_launcher_icons
 
-      # flutter：更新用户图标，此步骤需先在flutter项目中更新图标资源文件后才能应用新图标或执行 Convert Base64 app icons and Base64 splash screen to png 把Base64的图片格式转换成png并存储在指定资源目录下才能应用到新图标
-      - name: Update app icons
-        script: |
-          echo "Update icons..."
-          dart run flutter_launcher_icons
+            # flutter：更新启动图资源，此步骤需先在flutter项目中更新启动页资源文件后才能应用新的启动图或执行 Convert Base64 app icons and Base64 splash screen to png 把Base64的图片格式转换成png并存储在指定资源目录下才能应用到新图标
+            - name: Update splash screen
+              script: |
+                  echo "Updating splash screen..."
+                  dart run flutter_native_splash:create --path=./flutter_native_splash.yaml
 
-      # flutter：更新启动图资源，此步骤需先在flutter项目中更新启动页资源文件后才能应用新的启动图或执行 Convert Base64 app icons and Base64 splash screen to png 把Base64的图片格式转换成png并存储在指定资源目录下才能应用到新图标
-      - name: Update splash screen
-        script: |
-          echo "Updating splash screen..."
-          dart run flutter_native_splash:create --path=./flutter_native_splash.yaml
+            # flutter：更新项目 webUrl.dart 文件中的内容
+            - name: Update flutter webUrl.dart
+              script: |
+                  echo "Update webUrl.dart..."
+                  # 由于&在sed中是特殊语法，先自动将 & 转义为 \&，避免链接修改出错
+                  REAL_WEB_URL=$(echo "$WEB_URL" | sed 's/&/\\&/g')
+                  sed -e "s#const String webUrl = '[^']*'#const String webUrl = '${REAL_WEB_URL}'#g" \
+                      -e "s#const String jpushAppKey = '[^']*'#const String jpushAppKey = '${JPUSH_APP_KEY}'#g" \
+                      lib/webUrl.dart > lib/webUrl.dart.tmp && mv lib/webUrl.dart.tmp lib/webUrl.dart
+                  
+                  echo "Verifying updated variables..."
+                  cat lib/webUrl.dart
 
-      # flutter：更新项目 webUrl.dart 文件中的内容
-      - name: Update flutter webUrl.dart
-        script: |
-          echo "Update webUrl.dart..."
-          # 由于&在sed中是特殊语法，先自动将 & 转义为 \&，避免链接修改出错
-          REAL_WEB_URL=$(echo "$WEB_URL" | sed 's/&/\\&/g')
-          sed -e "s#const String webUrl = '[^']*'#const String webUrl = '${REAL_WEB_URL}'#g" \
-              -e "s#const String jpushAppKey = '[^']*'#const String jpushAppKey = '${JPUSH_APP_KEY}'#g" \
-              lib/webUrl.dart > lib/webUrl.dart.tmp && mv lib/webUrl.dart.tmp lib/webUrl.dart
-          
-          echo "Verifying updated variables..."
-          cat lib/webUrl.dart
+            # flutter 修改android模块下用于deeplink唤起协议的host链接，与应用包名 PACKAGE_NAME 一致
+            - name: Update flutter android modules deeplink host value
+              script: |
+                  echo "更新 AndroidManifest.xml..."
+                  
+                  MANIFEST_FILE="android/app/src/main/AndroidManifest.xml"
+                  
+                  # 检查文件是否存在
+                  if [ ! -f "$MANIFEST_FILE" ]; then
+                      echo "错误：找不到文件 $MANIFEST_FILE"
+                      exit 1
+                  fi
+                  
+                  echo "原始内容："
+                  grep -n "android:host=" "$MANIFEST_FILE"
+                  
+                  # 创建临时文件
+                  TEMP_FILE="${MANIFEST_FILE}.tmp"
+                  
+                  # 使用临时文件避免 sed -i 的兼容性问题
+                  sed "s|android:host=\"open.native.app\"|android:host=\"${PACKAGE_NAME}\"|g" "$MANIFEST_FILE" > "$TEMP_FILE"
+                  
+                  # 检查是否成功
+                  if [ $? -eq 0 ] && [ -s "$TEMP_FILE" ]; then
+                      # 替换原文件
+                      mv "$TEMP_FILE" "$MANIFEST_FILE"
+                      echo ""
+                      echo "修改后的内容："
+                      grep -n "android:host=" "$MANIFEST_FILE"
+                      echo "✅ 修改成功！"
+                  else
+                      echo "❌ 修改失败"
+                      rm -f "$TEMP_FILE"
+                      exit 1
+                  fi
 
-      # android. 打包构建安卓apk
-      - name: Build apk with Flutter
-        script: |
-          flutter build apk \
-            --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}" \
-            --no-tree-shake-icons --target-platform android-arm64
+            # flutter 更新android模块下用于google官方通道推送消息的google-services.json，与应用包名 PACKAGE_NAME 一致
+            - name: Update flutter android modules google-services.json file
+              script: |
+                  # 目标文件路径（可根据需要调整）
+                  TARGET_FILE="android/app/google-services.json"
+                  # ====================================================
+                  
+                  # 显示错误信息并退出
+                  error_exit() {
+                      echo "错误: $1"
+                      exit 1
+                  }
+                  
+                  # 校验JSON格式是否合法（需要安装jq）
+                  validate_json() {
+                      local json_content="$1"
+                      if ! echo "$json_content" | jq . > /dev/null 2>&1; then
+                          error_exit "提供的JSON内容格式不合法"
+                      fi
+                  }
+                  
+                  # 备份原文件
+                  backup_file() {
+                      if [ -f "$TARGET_FILE" ]; then
+                          local backup_file="${TARGET_FILE}.$(date +%Y%m%d%H%M%S).bak"
+                          cp "$TARGET_FILE" "$backup_file"
+                          echo "已备份原文件至: $backup_file"
+                      fi
+                  }
+                  
+                  # 判断字符串是否为URL
+                  is_url() {
+                      local str="$1"
+                      if [[ "$str" =~ ^https?:// ]]; then
+                          return 0
+                      else
+                          return 1
+                      fi
+                  }
+                  
+                  # 主逻辑
+                  main() {
+                      # 检查必要工具
+                      if ! command -v curl > /dev/null 2>&1; then
+                          error_exit "请先安装curl工具 (apt install curl 或 yum install curl)"
+                      fi
+                  
+                      if ! command -v jq > /dev/null 2>&1; then
+                          error_exit "请先安装jq工具 (apt install jq 或 yum install jq)"
+                      fi
+                  
+                      # 检查GCM变量是否为空
+                      if [ -z "$GCM" ]; then
+                          error_exit "GCM变量未配置，请在脚本顶部填写JSON字符串或下载链接"
+                      fi
+                  
+                      # 创建目标目录（如果不存在）
+                      mkdir -p "$(dirname "$TARGET_FILE")"
+                  
+                      # 处理GCM变量内容
+                      if is_url "$GCM"; then
+                          # 链接模式：下载JSON内容
+                          echo "正在从链接下载JSON文件: $GCM"
+                          JSON_CONTENT=$(curl -sSL "$GCM")
+                  
+                          if [ $? -ne 0 ]; then
+                              error_exit "无法从链接下载内容，请检查链接是否有效"
+                          fi
+                      else
+                          # JSON字符串模式
+                          echo "正在验证提供的JSON字符串..."
+                          JSON_CONTENT="$GCM"
+                      fi
+                  
+                      # 校验JSON格式
+                      validate_json "$JSON_CONTENT"
+                  
+                      # 备份并写入文件
+                      backup_file
+                      echo "$JSON_CONTENT" > "$TARGET_FILE"
+                  
+                      if [ $? -eq 0 ]; then
+                          echo "✅ 成功: google-services.json文件已更新"
+                          echo "📄 文件路径: $TARGET_FILE"
+                          cat "$TARGET_FILE"
+                      else
+                          error_exit "写入文件失败，请检查文件权限"
+                      fi
+                  }
+                  
+                  # 执行主逻辑
+                  main
 
-
-      # ios. 安装 Pods
-      # - name: Install pods
-      #   script: |
-      #     find . -name "Podfile" -execdir pod install \;
-
-      # ios. 打包构建苹果ipa
-      # - name: Build ipa with Flutter
-      #   script: |
-      #     flutter build ipa --release \
-      #       --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}" \
-      #       --export-options-plist=/Users/builder/export_options.plist
-
-      # 报告构建状态
-      - name: Build finished successfully
-        script: touch ~/SUCCESS
-    artifacts:
-      - build/app/outputs/flutter-apk/**/*.apk
-      - build/**/outputs/**/mapping.txt
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-      - flutter_drive.log
-    publishing:
-      scripts:
-        - name: Install wrangler
-          script: npm install -g wrangler
-        - name: Publish to Cloudflare R2
-          script: |
-            if [  -f ~/SUCCESS ] ; then
-               # build successful
-                echo "Start to upload .apk to R2"
-                PWD="$(pwd)"
-                echo "PWD: ${PWD}"
+            # android. 打包构建安卓apk
+            - name: Build apk with Flutter
+              script: |
+                  flutter build apk \
+                    --release \
+                    --build-name="${APP_VERSION}" \
+                    --build-number="${BUILD_NUMBER}" \
+                    --target-platform=android-arm64 --split-per-abi \
+                    --split-debug-info=./split-debug-info \
+                    --obfuscate \
+                    --shrink \
+                    --dart-define=FLUTTER_BUILD_MODE=release \
+                    --dart-define=ENABLE_ASSET_COMPRESSION=true
             
-                R2_OBJECT_PATH="${R2_BUCKET}/${BUCKET_FILEPATH}/app-release.apk"
-                echo "R2_OBJECT_PATH: ${R2_OBJECT_PATH}"
-            
-                LOCAL_PATH="${PWD}/build/app/outputs/flutter-apk/app-release.apk"
-                echo "LOCAL_PATH: ${LOCAL_PATH}"
-                
-                # 检查apk文件是否存在
-                if [ ! -f "${LOCAL_PATH}" ] ; then
-                  echo "❌ ${LOCAL_PATH} 不存在"
-                  exit 1
-                else 
-                  echo "✅ ${LOCAL_PATH} 存在"
-                fi
-                
-                # 打印wrangler命令的文本
-                echo "🚀 do run: wrangler r2 object put \"${R2_OBJECT_PATH}\" --file=\"${LOCAL_PATH}\" --remote --content-type \"application/vnd.android.package-archive\" "
-            
-                wrangler r2 object put "${R2_OBJECT_PATH}" --file="${LOCAL_PATH}" --remote --content-type "application/vnd.android.package-archive"
-            
-                echo "End to upload .apk to R2"
-            else
-               # build failed
-               echo "Build failed, skipping APK upload"
-            fi
-  #      email:
-  #        recipients:
-  #          - xx@x.com
-  #        notify:
-  #          success: true
-  #          failure: false
 
-  # Flutter构建流水线（ios非签名版本）
-  flutter-workflow-nosign:
-    name: Flutter Workflow Nosign
-    instance_type: mac_mini_m2
-    max_build_duration: 120
-    environment:
-      # android签名信息
-      android_signing:
-        - cc_game_apk_jks
-      vars:
-        # 自定义包名，修改后影响较大
-        # ios推送证书未知，android需更新推送平台信息
-        PACKAGE_NAME: "com.ccgametest.life"
-        # 自定义待加载的极光推送的 JPUSH_APP_KEY【与 PACKAGE_NAME 包名高度绑定，一旦包名变更，此值也须变更，主要受推送平台影响】
-        JPUSH_APP_KEY: "8b68b9303424eadca9e99ae9"
-        # 自定义应用版本号
-        APP_VERSION: "1.0.1"
-        # 自定义应用构建号
-        BUILD_NUMBER: "1"
-        # 自定义应用名称
-        APP_NAME: "CC GAME 2"
-        # 自定义待加载的 web 网址 以及 网址中用来请求的api链接
-        WEB_URL: "https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev?baseUrl=https://9212-bankski-game-v1h88uwaamm.ws-us121.gitpod.io"
+            # ios. 安装 Pods
+            # - name: Install pods
+            #   script: |
+            #     find . -name "Podfile" -execdir pod install \;
 
-      flutter: stable
-      xcode: latest
-      cocoapods: default
-    scripts:
-      # android. 配置local.properties
-      - name: Set up local.properties
-        script: |
-          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+            # ios. 打包构建苹果ipa
+            # - name: Build ipa with Flutter
+            #   script: |
+            #     flutter build ipa --release \
+            #       --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}" \
+            #       --export-options-plist=/Users/builder/export_options.plist
 
-      # 获取Flutter依赖
-      - name: Get Flutter packages
-        script: |
-          flutter pub get
+            # 报告构建状态
+            - name: Build finished successfully
+              script: touch ~/SUCCESS
+        artifacts:
+            - build/app/outputs/flutter-apk/**/*.apk
+            - build/**/outputs/**/mapping.txt
+            - build/ios/ipa/*.ipa
+            - /tmp/xcodebuild_logs/*.log
+            - flutter_drive.log
+        publishing:
+            scripts:
+                - name: Install wrangler
+                  script: npm install -g wrangler
+                - name: Publish to Cloudflare R2
+                  script: |
+                      if [  -f ~/SUCCESS ] ; then
+                         # build successful
+                          echo "Start to upload .apk to R2"
+                          PWD="$(pwd)"
+                          echo "PWD: ${PWD}"
+                      
+                          R2_OBJECT_PATH="${R2_BUCKET}/${BUCKET_FILEPATH}/app-arm64-v8a-release.apk"
+                          echo "R2_OBJECT_PATH: ${R2_OBJECT_PATH}"
+                      
+                          LOCAL_PATH="${PWD}/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk"
+                          echo "LOCAL_PATH: ${LOCAL_PATH}"
+                      
+                          # 检查apk文件是否存在
+                          if [ ! -f "${LOCAL_PATH}" ] ; then
+                            echo "❌ ${LOCAL_PATH} 不存在"
+                            exit 1
+                          else 
+                            echo "✅ ${LOCAL_PATH} 存在"
+                          fi
+                      
+                          # 打印wrangler命令的文本
+                          echo "🚀 do run: wrangler r2 object put \"${R2_OBJECT_PATH}\" --file=\"${LOCAL_PATH}\" --remote --content-type \"application/vnd.android.package-archive\" "
+                      
+                          wrangler r2 object put "${R2_OBJECT_PATH}" --file="${LOCAL_PATH}" --remote --content-type "application/vnd.android.package-archive"
+                      
+                          echo "End to upload .apk to R2"
+                      else
+                         # build failed
+                         echo "Build failed, skipping APK upload"
+                      fi
 
-      # flutter：修改应用包名（android、ios）
-      # 修改后包名为 PACKAGE_NAME 对应的值，ios推送证书未知，android需更新推送平台信息
-      - name: Update android ios package name
-        script: |
-          echo "Update android ios package name..."
-          dart run change_app_package_name:main "${PACKAGE_NAME}"
+    # Flutter构建流水线（ios非签名版本）
+    flutter-workflow-nosign:
+        name: Flutter Workflow Nosign
+        instance_type: mac_mini_m2
+        max_build_duration: 120
+        environment:
+            # android签名信息
+            android_signing:
+                - cc_game_apk_jks
+            vars:
+                # 自定义包名，修改后影响较大
+                # ios推送证书未知，android需更新推送平台信息
+                PACKAGE_NAME: "com.ccgametest.life"
+                # 自定义待加载的极光推送的 JPUSH_APP_KEY【与 PACKAGE_NAME 包名高度绑定，一旦包名变更，此值也须变更，主要受推送平台影响】
+                JPUSH_APP_KEY: "8b68b9303424eadca9e99ae9"
+                # 自定义应用版本号
+                APP_VERSION: "1.0.1"
+                # 自定义应用构建号
+                BUILD_NUMBER: "1"
+                # 自定义应用名称
+                APP_NAME: "CC GAME 2"
+                # 自定义待加载的 web 网址 以及 网址中用来请求的api链接
+                WEB_URL: "https://reimagined-memory-jjgwj4xwqgxrfq4p4-8080.app.github.dev?baseUrl=https://9212-bankski-game-v1h88uwaamm.ws-us121.gitpod.io"
 
-      # flutter：更新应用名称
-      - name: Update app name
-        script: |
-          echo "Updating app name..."
-          dart run rename_app:main all="${APP_NAME}"
+            flutter: stable
+            xcode: latest
+            cocoapods: default
+        scripts:
+            # android. 配置local.properties
+            - name: Set up local.properties
+              script: |
+                  echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
 
-      # flutter：更新用户图标，此步骤需先在flutter项目中更新图标资源文件后才能应用新图标
-      - name: Update app icons
-        script: |
-          echo "Update icons..."
-          dart run flutter_launcher_icons
+            # 获取Flutter依赖
+            - name: Get Flutter packages
+              script: |
+                  flutter pub get
 
-      # flutter：更新启动图资源，此步骤需先在flutter项目中更新启动页资源文件后才能应用新的启动图
-      - name: Update splash screen
-        script: |
-          echo "Updating splash screen..."
-          dart run flutter_native_splash:create --path=./flutter_native_splash.yaml
+            # flutter：修改应用包名（android、ios）
+            # 修改后包名为 PACKAGE_NAME 对应的值，ios推送证书未知，android需更新推送平台信息
+            - name: Update android ios package name
+              script: |
+                  echo "Update android ios package name..."
+                  dart run change_app_package_name:main "${PACKAGE_NAME}"
 
-      # flutter：更新项目 webUrl.dart 文件中的内容
-      - name: Update flutter webUrl.dart
-        script: |
-          echo "Update webUrl.dart..."
-          sed -e "s#const String webUrl = '[^']*'#const String webUrl = '${WEB_URL}'#g" \
-              -e "s#const String jpushAppKey = '[^']*'#const String jpushAppKey = '${JPUSH_APP_KEY}'#g" \
-              lib/webUrl.dart > lib/webUrl.dart.tmp && mv lib/webUrl.dart.tmp lib/webUrl.dart
-          
-          echo "Verifying updated variables..."
-          cat lib/webUrl.dart
+            # flutter：更新应用名称
+            - name: Update app name
+              script: |
+                  echo "Updating app name..."
+                  dart run rename_app:main all="${APP_NAME}"
 
-      # android. 打包构建安卓apk
-      - name: Build apk with Flutter
-        script: |
-          flutter build apk \
-            --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}" \
-            --no-tree-shake-icons --split-per-abi
+            # flutter：更新用户图标，此步骤需先在flutter项目中更新图标资源文件后才能应用新图标
+            - name: Update app icons
+              script: |
+                  echo "Update icons..."
+                  dart run flutter_launcher_icons
 
-      # ios. 安装 Pods
-      - name: Install pods
-        script: |
-          find . -name "Podfile" -execdir pod install \;
+            # flutter：更新启动图资源，此步骤需先在flutter项目中更新启动页资源文件后才能应用新的启动图
+            - name: Update splash screen
+              script: |
+                  echo "Updating splash screen..."
+                  dart run flutter_native_splash:create --path=./flutter_native_splash.yaml
 
-      # ios. 打包构建苹果ipa (未签名)
-      - name: Build unsigned ipa with Flutter
-        script: |
-          flutter build ios --release \
-            --no-codesign \
-            --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}"
-          
-          mkdir -p build/ios/ipa
-          cd build/ios/iphoneos
-          mkdir -p Payload
-          cp -r Runner.app Payload/
-          zip -r ../ipa/Runner-unsigned.ipa Payload
+            # flutter：更新项目 webUrl.dart 文件中的内容
+            - name: Update flutter webUrl.dart
+              script: |
+                  echo "Update webUrl.dart..."
+                  sed -e "s#const String webUrl = '[^']*'#const String webUrl = '${WEB_URL}'#g" \
+                      -e "s#const String jpushAppKey = '[^']*'#const String jpushAppKey = '${JPUSH_APP_KEY}'#g" \
+                      lib/webUrl.dart > lib/webUrl.dart.tmp && mv lib/webUrl.dart.tmp lib/webUrl.dart
+                  
+                  echo "Verifying updated variables..."
+                  cat lib/webUrl.dart
 
-    artifacts:
-      - build/app/outputs/flutter-apk/**/*.apk
-      - build/**/outputs/**/mapping.txt
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-      - flutter_drive.log
+            # android. 打包构建安卓apk
+            - name: Build apk with Flutter
+              script: |
+                  flutter build apk \
+                    --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}" \
+                    --no-tree-shake-icons --split-per-abi
+
+            # ios. 安装 Pods
+            - name: Install pods
+              script: |
+                  find . -name "Podfile" -execdir pod install \;
+
+            # ios. 打包构建苹果ipa (未签名)
+            - name: Build unsigned ipa with Flutter
+              script: |
+                  flutter build ios --release \
+                    --no-codesign \
+                    --build-name="${APP_VERSION}" --build-number="${BUILD_NUMBER}"
+                  
+                  mkdir -p build/ios/ipa
+                  cd build/ios/iphoneos
+                  mkdir -p Payload
+                  cp -r Runner.app Payload/
+                  zip -r ../ipa/Runner-unsigned.ipa Payload
+
+        artifacts:
+            - build/app/outputs/flutter-apk/**/*.apk
+            - build/**/outputs/**/mapping.txt
+            - build/ios/ipa/*.ipa
+            - /tmp/xcodebuild_logs/*.log
+            - flutter_drive.log
